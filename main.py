@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
 import sys
 
 
-class CutiePy(QWidget):
+class MontanaPy(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -19,7 +19,7 @@ class CutiePy(QWidget):
 
         # TODO Separate into tabs for instruments, programs, analysis, etc
         # self.resize(300, 420)
-        self.setWindowTitle("Cutie Py")
+        self.setWindowTitle("Montana Py")
 
         # Load stylesheet
         with open('css/main.css', 'r') as f:
@@ -71,8 +71,6 @@ class Confocal(QWidget):
             self.setStyleSheet(style)
 
         layout = QVBoxLayout()
-        self.label = QLabel("Confocal")
-        layout.addWidget(self.label)
 
         self.setLayout(layout)
 
@@ -84,6 +82,6 @@ class Confocal(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    qt = CutiePy()
+    qt = MontanaPy()
     qt.show()
     sys.exit(app.exec())
