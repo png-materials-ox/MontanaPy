@@ -1,0 +1,13 @@
+QWidget{
+    background: #262D37;
+}
+QPushButton{
+    color: #fff;
+    padding: 5px 10px;
+    font-weight: 12pt;
+    font-size: 12pt;
+    font: Oswald;
+}
+QPushButton:hover{
+    background: #262D80;
+}

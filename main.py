@@ -21,24 +21,10 @@ class CutiePy(QWidget):
         # self.resize(300, 420)
         self.setWindowTitle("Cutie Py")
 
-        # TODO Make proper stylesheet - perhaps a separate css-type document
-        # self.setStyleSheet("background-color : black; color : white")
-        style = """
-                QWidget{
-                    background: #262D37;
-                }
-                QPushButton{
-                    color: #fff;
-                    padding: 5px 10px;
-                    font-weight: 12pt;
-                    font-size: 12pt;
-                    font: Oswald;
-                }
-                QPushButton:hover{
-                    background: #262D80;
-                }
-            """
-        self.setStyleSheet(style)
+        # Load stylesheet
+        with open('css/main.css', 'r') as f:
+            style = f.read()
+            self.setStyleSheet(style)
 
         self.layout = QVBoxLayout()
 
@@ -74,14 +60,26 @@ class CutiePy(QWidget):
         self.confocal_window.setWindowTitle("Confocal Window")
         self.confocal_window.show()
 
+
 class Confocal(QWidget):
     def __init__(self):
         super().__init__()
 
+        # Load stylesheet
+        with open('css/confocal.css', 'r') as f:
+            style = f.read()
+            self.setStyleSheet(style)
+
         layout = QVBoxLayout()
         self.label = QLabel("Confocal")
         layout.addWidget(self.label)
+
         self.setLayout(layout)
+
+        #TODO Work out how to put this in the css file.
+        self.resize(1200, 800)
+
+
 
 
 if __name__ == '__main__':
