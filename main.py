@@ -7,6 +7,13 @@ from PySide6.QtWidgets import (
 )
 import sys
 
+from aom import AOM
+from eom import EOM
+from confocal import Confocal
+
+import warnings
+warnings.filterwarnings("ignore")
+
 
 class MontanaPy(QWidget):
     def __init__(self, parent=None):
@@ -30,6 +37,7 @@ class MontanaPy(QWidget):
 
         # TODO This data should come from a config file, so it can be dynamic.
         self._options = ["AOM",
+                         "EOM",
                          "WLS",
                          "Toptica Laser",
                          "GEM 532",
@@ -47,6 +55,8 @@ class MontanaPy(QWidget):
 
         self.setLayout(self.layout)
 
+        self.buttons["AOM"].clicked.connect(self.open_aom_window)
+        self.buttons["EOM"].clicked.connect(self.open_eom_window)
         self.buttons["Confocal"].clicked.connect(self.open_confocal_window)
 
     def _create_button(self, name):
@@ -55,29 +65,20 @@ class MontanaPy(QWidget):
         self.layout.addWidget(button)
         return button
 
+    def open_aom_window(self):
+        self.aom_window = AOM()
+        self.aom_window.setWindowTitle("AOM Window")
+        self.aom_window.show()
+
+    def open_eom_window(self):
+        self.aom_window = EOM()
+        self.aom_window.setWindowTitle("EOM Window")
+        self.aom_window.show()
+
     def open_confocal_window(self):
         self.confocal_window = Confocal()
         self.confocal_window.setWindowTitle("Confocal Window")
         self.confocal_window.show()
-
-
-class Confocal(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        # Load stylesheet
-        with open('css/confocal.css', 'r') as f:
-            style = f.read()
-            self.setStyleSheet(style)
-
-        layout = QVBoxLayout()
-
-        self.setLayout(layout)
-
-        #TODO Work out how to put this in the css file.
-        self.resize(1200, 800)
-
-
 
 
 if __name__ == '__main__':
