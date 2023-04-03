@@ -16,10 +16,12 @@ class MontanaPy(QWidget):
         self.tab_widget = QTabWidget()
         self.instruments_tab = QWidget()
         self.programs_tab = QWidget()
+        self.analysis_tab = QWidget()
 
         # Add the tabs to the tab widget
         self.tab_widget.addTab(self.instruments_tab, "Instruments")
         self.tab_widget.addTab(self.programs_tab, "Programs")
+        self.tab_widget.addTab(self.analysis_tab, "Analysis")
 
         # Set the layout for the instruments tab
         self.instruments_layout = QVBoxLayout()
@@ -41,6 +43,9 @@ class MontanaPy(QWidget):
                          "Automate Grid Spectra Collection",
                          "Peak-Find"]
 
+        self._analysis_options = ["PL Analysis",
+                                 "Spectra Analysis"]
+
         self.instrument_buttons = {}
         for name in self._instrument_options:
             self.instrument_buttons["%s" % name] = self._create_instr_button(name)
@@ -57,6 +62,16 @@ class MontanaPy(QWidget):
 
         self.programs_layout.addStretch()
         self.programs_tab.setLayout(self.programs_layout)
+
+        # Set the layout for the analysis tab
+        self.analysis_layout = QVBoxLayout()
+
+        self.analysis_buttons = {}
+        for name in self._analysis_options:
+            self.analysis_buttons["%s" % name] = self._create_analysis_button(name)
+
+        self.analysis_layout.addStretch()
+        self.analysis_tab.setLayout(self.analysis_layout)
 
         # Set the main layout for the widget
         self.main_layout = QVBoxLayout()
@@ -86,6 +101,12 @@ class MontanaPy(QWidget):
         button = QPushButton(name)
         button.setObjectName(name)
         self.programs_layout.addWidget(button)
+        return button
+
+    def _create_analysis_button(self, name):
+        button = QPushButton(name)
+        button.setObjectName(name)
+        self.analysis_layout.addWidget(button)
         return button
 
     def open_aom_window(self):
