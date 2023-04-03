@@ -1,11 +1,15 @@
 import sys
+import os
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QPushButton, QVBoxLayout, QWidget
 
+from instr_ctrl.eom_ctrl import EOM_Ctrl
 
 class EOM(QWidget):
     def __init__(self):
         super().__init__()
+
+        self.eom_ctrl = EOM_Ctrl()
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -24,7 +28,7 @@ class EOM(QWidget):
         self.button.setChecked(False)
 
         # Load stylesheet
-        with open('../css/aom.css', 'r') as f:
+        with open(os.path.join(os.getcwd() + "\\css\\aom.css"), 'r') as f:
             style = f.read()
             self.setStyleSheet(style)
 
@@ -38,5 +42,7 @@ class EOM(QWidget):
     def on_clicked(self):
         if self.button.isChecked():
             self.button.setText("EOM\nOn")
+            self.eom_ctrl.write_high()
         else:
             self.button.setText("EOM\nOff")
+            self.eom_ctrl.write_high()

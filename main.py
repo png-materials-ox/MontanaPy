@@ -9,6 +9,36 @@ warnings.filterwarnings("ignore")
 
 
 class MontanaPy(QWidget):
+    """
+
+    Author      : Gareth Siôn Jones
+    Affiliation : Oxford University
+    Department : epartment of Materials
+
+    Attributes
+    ----------
+
+    Methods
+    -------
+
+    _create_instr_button(name)
+        Creates buttons in the main GUI for the instument panel
+
+    _create_prog_button(name)
+        Creates buttons in the main GUI for the program panel
+
+    _create_analysis_button(name)
+        Creates buttons in the main GUI for the analysis panel
+
+    _open_aom_window()
+        Opens the AOM instrument control window
+
+    _open_eom_window()
+        Opens the EOM instrument control window
+
+    _open_confocal_window()
+        Opens the Confocal program windwow
+    """
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -34,9 +64,10 @@ class MontanaPy(QWidget):
                                     "GEM 532",
                                     "Oscilloscope",
                                     "Wavemeter",
+                                    "Power Meter",
                                     "Spectrometer",
                                     "Montana Piezos",
-                                    "Power Meter"
+                                    "Montana Temperature",
                                     ]
 
         self._program_options = ["Confocal",
@@ -88,9 +119,9 @@ class MontanaPy(QWidget):
             style = f.read()
             self.setStyleSheet(style)
 
-        self.instrument_buttons["AOM"].clicked.connect(self.open_aom_window)
-        self.instrument_buttons["EOM"].clicked.connect(self.open_eom_window)
-        self.program_buttons["Confocal"].clicked.connect(self.open_confocal_window)
+        self.instrument_buttons["AOM"].clicked.connect(self._open_aom_window)
+        self.instrument_buttons["EOM"].clicked.connect(self._open_eom_window)
+        self.program_buttons["Confocal"].clicked.connect(self._open_confocal_window)
 
     def _create_instr_button(self, name):
         button = QPushButton(name)
@@ -110,17 +141,17 @@ class MontanaPy(QWidget):
         self.analysis_layout.addWidget(button)
         return button
 
-    def open_aom_window(self):
+    def _open_aom_window(self):
         self.aom_window = AOM()
         self.aom_window.setWindowTitle("AOM Window")
         self.aom_window.show()
 
-    def open_eom_window(self):
+    def _open_eom_window(self):
         self.aom_window = EOM()
         self.aom_window.setWindowTitle("EOM Window")
         self.aom_window.show()
 
-    def open_confocal_window(self):
+    def _open_confocal_window(self):
         self.confocal_window = Confocal()
         self.confocal_window.setWindowTitle("Confocal Window")
         self.confocal_window.show()
