@@ -1,17 +1,10 @@
-from PySide6.QtWidgets import (
-    QWidget,
-    QPushButton,
-    QApplication,
-    QVBoxLayout,
-    QLabel,
-)
 import sys
-
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QTabWidget, QPushButton
 from aom import AOM
 from eom import EOM
 from confocal import Confocal
-
 import warnings
+
 warnings.filterwarnings("ignore")
 
 
@@ -19,50 +12,80 @@ class MontanaPy(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        # TODO Create title bar
+        # Create the tabs
+        self.tab_widget = QTabWidget()
+        self.instruments_tab = QWidget()
+        self.programs_tab = QWidget()
 
-        # TODO Create logo
-        # self.setWindowIcon(QTGui.QIcon("cutie-py.png"))
+        # Add the tabs to the tab widget
+        self.tab_widget.addTab(self.instruments_tab, "Instruments")
+        self.tab_widget.addTab(self.programs_tab, "Programs")
 
-        # TODO Separate into tabs for instruments, programs, analysis, etc
-        # self.resize(300, 420)
-        self.setWindowTitle("Montana Py")
-
-        # Load stylesheet
-        with open('css/main.css', 'r') as f:
-            style = f.read()
-            self.setStyleSheet(style)
-
-        self.layout = QVBoxLayout()
+        # Set the layout for the instruments tab
+        self.instruments_layout = QVBoxLayout()
 
         # TODO This data should come from a config file, so it can be dynamic.
-        self._options = ["AOM",
-                         "EOM",
-                         "WLS",
-                         "Toptica Laser",
-                         "GEM 532",
-                         "Oscilloscope",
-                         "Wavemeter",
-                         "Spectrometer",
-                         "Montana Piezos",
-                         "Confocal",
+        self._instrument_options = ["AOM",
+                                    "EOM",
+                                    "WLS",
+                                    "Toptica Laser",
+                                    "GEM 532",
+                                    "Oscilloscope",
+                                    "Wavemeter",
+                                    "Spectrometer",
+                                    "Montana Piezos"
+                                    ]
+
+        self._program_options = ["Confocal",
                          "PLE",
                          "Automate Grid Spectra Collection",
                          "Peak-Find"]
-        self.buttons = {}
-        for name in self._options:
-            self.buttons["%s" % name] = self._create_button(name)
 
-        self.setLayout(self.layout)
+        self.instrument_buttons = {}
+        for name in self._instrument_options:
+            self.instrument_buttons["%s" % name] = self._create_instr_button(name)
 
-        self.buttons["AOM"].clicked.connect(self.open_aom_window)
-        self.buttons["EOM"].clicked.connect(self.open_eom_window)
-        self.buttons["Confocal"].clicked.connect(self.open_confocal_window)
+        self.instruments_layout.addStretch()
+        self.instruments_tab.setLayout(self.instruments_layout)
 
-    def _create_button(self, name):
+        # Set the layout for the programs tab
+        self.programs_layout = QVBoxLayout()
+
+        self.program_buttons = {}
+        for name in self._program_options:
+            self.program_buttons["%s" % name] = self._create_prog_button(name)
+
+        self.programs_layout.addStretch()
+        self.programs_tab.setLayout(self.programs_layout)
+
+        # Set the main layout for the widget
+        self.main_layout = QVBoxLayout()
+        self.main_layout.addWidget(self.tab_widget)
+        self.setLayout(self.main_layout)
+
+        # Set the window properties
+        self.setWindowTitle("Montana Py")
+        self.setGeometry(300, 300, 300, 300)
+
+        # Load stylesheet
+        with open("css/main.css", "r") as f:
+            style = f.read()
+            self.setStyleSheet(style)
+
+        self.instrument_buttons["AOM"].clicked.connect(self.open_aom_window)
+        self.instrument_buttons["EOM"].clicked.connect(self.open_eom_window)
+        self.program_buttons["Confocal"].clicked.connect(self.open_confocal_window)
+
+    def _create_instr_button(self, name):
         button = QPushButton(name)
         button.setObjectName(name)
-        self.layout.addWidget(button)
+        self.instruments_layout.addWidget(button)
+        return button
+
+    def _create_prog_button(self, name):
+        button = QPushButton(name)
+        button.setObjectName(name)
+        self.programs_layout.addWidget(button)
         return button
 
     def open_aom_window(self):
@@ -79,7 +102,6 @@ class MontanaPy(QWidget):
         self.confocal_window = Confocal()
         self.confocal_window.setWindowTitle("Confocal Window")
         self.confocal_window.show()
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
