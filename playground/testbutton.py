@@ -3,7 +3,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QPushButton, QVBoxLayout, QWidget
 
 
-class AOM(QWidget):
+class MyWidget(QWidget):
     def __init__(self):
         super().__init__()
 
@@ -24,7 +24,7 @@ class AOM(QWidget):
         self.button.setChecked(False)
 
         # Load stylesheet
-        with open('css/aom.css', 'r') as f:
+        with open('../css/aom.css', 'r') as f:
             style = f.read()
             self.setStyleSheet(style)
 

@@ -1,10 +1,10 @@
 import sys
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QTabWidget, QPushButton
-from aom import AOM
-from eom import EOM
-from confocal import Confocal
-import warnings
+from gui.aom import AOM
+from gui.eom import EOM
+from gui.confocal import Confocal
 
+import warnings
 warnings.filterwarnings("ignore")
 
 
@@ -35,7 +35,8 @@ class MontanaPy(QWidget):
                                     "Oscilloscope",
                                     "Wavemeter",
                                     "Spectrometer",
-                                    "Montana Piezos"
+                                    "Montana Piezos",
+                                    "Power Meter"
                                     ]
 
         self._program_options = ["Confocal",

@@ -15,7 +15,7 @@ class Confocal(QWidget):
         super().__init__()
 
         # Load stylesheet
-        with open('css/confocal.css', 'r') as f:
+        with open('../css/confocal.css', 'r') as f:
             style = f.read()
             self.setStyleSheet(style)
 

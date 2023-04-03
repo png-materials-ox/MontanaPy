@@ -3,7 +3,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QPushButton, QVBoxLayout, QWidget
 
 
-class EOM(QWidget):
+class AOM(QWidget):
     def __init__(self):
         super().__init__()
 
@@ -19,12 +19,12 @@ class EOM(QWidget):
         # layout.setFixedSize(200, 400)
 
         self.button = QPushButton()
-        self.button.setText("EOM\nOff")
+        self.button.setText("AOM\nOff")
         self.button.setCheckable(True)
         self.button.setChecked(False)
 
         # Load stylesheet
-        with open('css/aom.css', 'r') as f:
+        with open('../css/aom.css', 'r') as f:
             style = f.read()
             self.setStyleSheet(style)
 
@@ -37,6 +37,13 @@ class EOM(QWidget):
 
     def on_clicked(self):
         if self.button.isChecked():
-            self.button.setText("EOM\nOn")
+            self.button.setText("AOM\nOn")
         else:
-            self.button.setText("EOM\nOff")
+            self.button.setText("AOM\nOff")
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    widget = MyWidget()
+    widget.show()
+    sys.exit(app.exec())
