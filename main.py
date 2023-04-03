@@ -10,10 +10,15 @@ warnings.filterwarnings("ignore")
 
 class MontanaPy(QWidget):
     """
+    MontanaPy
 
+    Control and analysis software for optical microscopy and control of quantum defect centers. MontanaPy is the main
+    window presented to a user, providing navigation options.
+
+    Version     : 0.1.0
     Author      : Gareth Siôn Jones
     Affiliation : Oxford University
-    Department : epartment of Materials
+    Department  : Department of Materials
 
     Attributes
     ----------

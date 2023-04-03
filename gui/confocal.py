@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QTimer
 import pyqtgraph as pg
 import sys
+import os
 import numpy as np
 
 import time
@@ -18,7 +19,7 @@ class Confocal(QWidget):
         super().__init__()
 
         # Load stylesheet
-        with open('../css/confocal.css', 'r') as f:
+        with open(os.path.join(os.getcwd() +"\\css\\confocal.css"), 'r') as f:
             style = f.read()
             self.setStyleSheet(style)
 
