@@ -12,6 +12,6 @@ class AOM_Ctrl:
 
     def write_low(self):
         with nidaqmx.Task() as task:
-            # Set the digital output pin to high
+            # Set the digital output pin to low
             task.do_channels.add_do_chan(self.channel)
-            task.write(True)
+            task.write(False)

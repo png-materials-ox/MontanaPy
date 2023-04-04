@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QTabWidget, QP
 from gui.aom import AOM
 from gui.eom import EOM
 from gui.confocal import Confocal
+from gui.single_photon_counter import SPC
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -47,6 +48,8 @@ class MontanaPy(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.windows = []
+
         # Create the tabs
         self.tab_widget = QTabWidget()
         self.instruments_tab = QWidget()
@@ -66,6 +69,7 @@ class MontanaPy(QWidget):
                                     "EOM",
                                     "WLS",
                                     "Toptica Laser",
+                                    "Single Photon Counter",
                                     "GEM 532",
                                     "Oscilloscope",
                                     "Wavemeter",
@@ -126,6 +130,7 @@ class MontanaPy(QWidget):
 
         self.instrument_buttons["AOM"].clicked.connect(self._open_aom_window)
         self.instrument_buttons["EOM"].clicked.connect(self._open_eom_window)
+        self.instrument_buttons["Single Photon Counter"].clicked.connect(self._open_spc_window)
         self.program_buttons["Confocal"].clicked.connect(self._open_confocal_window)
 
     def _create_instr_button(self, name):
@@ -150,16 +155,25 @@ class MontanaPy(QWidget):
         self.aom_window = AOM()
         self.aom_window.setWindowTitle("AOM Window")
         self.aom_window.show()
+        self.aom_window.setParent(None)
+
+    def _open_spc_window(self):
+        self.spc_window = SPC()
+        self.spc_window.setWindowTitle("SPC Window")
+        self.spc_window.show()
+        self.spc_window.setParent(None)
 
     def _open_eom_window(self):
-        self.aom_window = EOM()
-        self.aom_window.setWindowTitle("EOM Window")
-        self.aom_window.show()
+        self.eom_window = EOM()
+        self.eom_window.setWindowTitle("EOM Window")
+        self.eom_window.show()
+        self.eom_window.setParent(None)
 
     def _open_confocal_window(self):
         self.confocal_window = Confocal()
         self.confocal_window.setWindowTitle("Confocal Window")
         self.confocal_window.show()
+        self.confocal_window.setParent(None)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
