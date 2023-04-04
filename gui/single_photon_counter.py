@@ -1,4 +1,5 @@
 from PySide6 import QtWidgets, QtCore
+from PySide6.QtGui import QLinearGradient
 from pyqtgraph import PlotWidget, plot
 import pyqtgraph as pg
 import sys  # We need sys so that we can pass argv to QApplication
@@ -43,7 +44,20 @@ class SPC(QtWidgets.QMainWindow):
         # plot.setStyleSheet(style)
 
         self.graphWidget = pg.PlotWidget()
-        self.graphWidget.setStyleSheet(style)
+        self.resize(1000, 600)
+
+        # create a linear gradient for the background color
+        # TODO Put into css style file
+        grad = QLinearGradient(0, 0, 0, self.graphWidget.height())
+        grad.setColorAt(0, pg.mkColor('#565656'))
+        grad.setColorAt(0.1, pg.mkColor('#525252'))
+        grad.setColorAt(0.5, pg.mkColor('#4e4e4e'))
+        grad.setColorAt(0.9, pg.mkColor('#4a4a4a'))
+        grad.setColorAt(1, pg.mkColor('#464646'))
+
+        # set the background brush of the plot widget to the gradient
+        self.graphWidget.setBackgroundBrush(grad)
+        # self.graphWidget.setStyleSheet(style)
         self.setCentralWidget(self.graphWidget)
 
         self.x = list(range(100))  # 100 time points
@@ -53,20 +67,40 @@ class SPC(QtWidgets.QMainWindow):
 
         pen = pg.mkPen(color=(255, 0, 0))
         # self.data_line = self.graphWidget.plot(self.x, self.y, pen=pen, color='green')
-        self.data_line = pg.ScatterPlotItem(pen=pg.mkPen(width=7, color='green'), symbol='o', size=3)
-        self.graphWidget.addItem(self.data_line)
+        self.data_scatter = pg.ScatterPlotItem(pen=pg.mkPen(width=7, color='#ffa02f'), symbol='o', size=3)
+        self.graphWidget.addItem(self.data_scatter)
         self.timer = QtCore.QTimer()
         self.timer.setInterval(50)
         self.timer.timeout.connect(self.update_plot_data)
         self.timer.start()
 
+        # TODO Put all this into css style file
+        title_style = {'color': '#FFFFFF', 'font-size': '24pt', 'font-weight': 'bold'}
+        self.graphWidget.setTitle("Single Photon Counter", **title_style)
+
+        # set the font size and weight of the x-axis label
+        x_label_style = {'color': '#FFFFFF', 'font-size': '12pt', 'font-weight': 'bold'}
+        self.graphWidget.setLabel('bottom', "", **x_label_style)
+
+        # set the font size and weight of the y-axis label
+        y_label_style = {'color': '#FFFFFF', 'font-size': '12pt', 'font-weight': 'bold'}
+        self.graphWidget.setLabel('left', "Counts/s", **y_label_style)
+
+        x_axis = self.graphWidget.getAxis('bottom')
+        x_tick_font = pg.QtGui.QFont('Arial', 12, weight=pg.QtGui.QFont.Bold)
+        x_axis.setTickFont(x_tick_font)
+        x_axis.setPen(pg.mkPen(color='#FFFFFF'))
+
+        y_axis = self.graphWidget.getAxis('left')
+        y_tick_font = pg.QtGui.QFont('Arial', 12, weight=pg.QtGui.QFont.Bold)
+        y_axis.setTickFont(y_tick_font)
+        y_axis.setPen(pg.mkPen(color='#FFFFFF'))
+
     def update_plot_data(self):
 
         self.x = self.x[1:]  # Remove the first y element.
-        # self.x.append(self.x[-1] + 1)  # Add a new value 1 higher than the last.
 
         self.y = self.y[1:]  # Remove the first
-        # self.y.append( randint(0,100))  # Add a new random value.
         time_total = 0
         with nidaqmx.Task() as task:
             task.ci_channels.add_ci_count_edges_chan("Dev1/ctr0")
@@ -86,4 +120,4 @@ class SPC(QtWidgets.QMainWindow):
 
             self.x.append(time_total)
             self.y.append(p)
-            self.data_line.setData(self.x, self.y)  # Update the data.
+            self.data_scatter.setData(self.x, self.y)
