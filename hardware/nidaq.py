@@ -1,19 +1,26 @@
 import nidaqmx
 import time
+import json
+import os
+
 
 class DAQ:
     def __init__(self):
 
-        #TODO get from config file
-        self.dev = "Dev1"
-        self.ctr_chan = self.dev + "/ctr0"
-        self.ctr_term = "/" + self.dev + "/PFI8"
+        _cfg_file = open(os.path.join(os.getcwd() + "\\config\\config.json"))
+        self.config = json.load(_cfg_file)
+        self.daq = self.config["hardware"]["nicard"]        # Daq device ID
+        self.ctr_chan = self.daq["counter_channels"][0]     # DAQ channel for single photon counting
+        self.photon_term = self.daq["photon_sources"][0]    # Associated timing channel for single photon counting
+
+        # self.fsm_x = self.daq + "/ai0"              # Fast steering mirror x
+        # self.fsm_y = self.daq + "/ai1"              # Fast steering mirror y
 
     def counter(self, sample_time):
         try:
             with nidaqmx.Task() as task:
                 task.ci_channels.add_ci_count_edges_chan(self.ctr_chan)
-                task.ci_channels[0].ci_count_edges_term = self.ctr_term
+                task.ci_channels[0].ci_count_edges_term = self.photon_term
 
                 task.start()
                 time.sleep(sample_time)
@@ -32,3 +39,6 @@ class DAQ:
 
         finally:
             task.close()
+
+    def scan_voltage(self):
+        pass

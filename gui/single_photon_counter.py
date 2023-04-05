@@ -167,7 +167,6 @@ class SPC(QMainWindow):
 
         self.ave_line.setData(self.ave_x, self.rolling_ave)
 
-        print(self.rolling_ave[-1])
         self.ave_label.setText(str(self.rolling_ave[-1]))
 
     def _moving_ave(self, window_size=5):
