@@ -6,7 +6,8 @@ import sys  # We need sys so that we can pass argv to QApplication
 import os
 from random import randint
 import time
-import nidaqmx
+
+from hardware.nidaq import DAQ
 
 import pandas as pd
 import numpy as np
@@ -17,11 +18,12 @@ class SPC(QtWidgets.QMainWindow):
         super(SPC, self).__init__(*args, **kwargs)
 
         # Load stylesheet
-        with open(os.path.join(os.getcwd() + "\\css\\confocal.css"), 'r') as f:
+        with open(os.path.join(os.getcwd() + "\\css\\single_photon_counter.css"), 'r') as f:
             style = f.read()
             self.setStyleSheet(style)
 
         self.graphWidget = pg.PlotWidget()
+        self.graphWidget.setStyleSheet(style)
         self.resize(1000, 600)
 
         # create a linear gradient for the background color
@@ -134,31 +136,22 @@ class SPC(QtWidgets.QMainWindow):
         self.ave_x = self.ave_x[1:]
         self.rolling_ave = self.rolling_ave[1:]
         time_total = 0
-        with nidaqmx.Task() as task:
-            task.ci_channels.add_ci_count_edges_chan("Dev1/ctr0")
-            task.ci_channels[0].ci_count_edges_term = "/Dev1/PFI8"
 
-            task.start()
-            time.sleep(self.sample_time)
-            cnt0 = task.read()
-            time.sleep(self.sample_time)
+        daq = DAQ()
+        p = daq.counter(self.sample_time)
 
-            cnt1 = task.read()
-            task.stop()
-            p = (cnt1 - cnt0) * (self.sample_time) ** -1
+        time_total = self.x[-1] + 1
 
-            time_total = self.x[-1] + 1
+        self.x.append(time_total)
+        self.y.append(p)
+        self.data_scatter.setData(self.x, self.y)
 
-            self.x.append(time_total)
-            self.y.append(p)
-            self.data_scatter.setData(self.x, self.y)
+        self.ave_x.append(self.x[-self.window_size])
+        self.rolling_ave.append(sum(self.y[-self.window_size:]) / self.window_size)
 
-            self.ave_x.append(self.x[-self.window_size])
-            self.rolling_ave.append(sum(self.y[-self.window_size:]) / self.window_size)
-            # self.rolling_ave.append(self._moving_ave(window_size=2))
-            self.ave_line.setData(self.ave_x, self.rolling_ave)
-            # self.ave_line.setData(self.rolling_ave)
-            print(self.rolling_ave[-1])
+        self.ave_line.setData(self.ave_x, self.rolling_ave)
+
+        print(self.rolling_ave[-1])
 
     def _moving_ave(self, window_size=5):
         i = 0
