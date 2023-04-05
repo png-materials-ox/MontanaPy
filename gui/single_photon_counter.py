@@ -8,40 +8,13 @@ from random import randint
 import time
 import nidaqmx
 
+import pandas as pd
+import numpy as np
+
 class SPC(QtWidgets.QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super(SPC, self).__init__(*args, **kwargs)
-
-        style = """
-            QWidget {
-                background-color: #f0f0f0;
-            }
-
-            QFrame {
-                background-color: white;
-                border: 1px solid #c0c0c0;
-            }
-
-            QLabel {
-                font-size: 36px;
-                font-weight: bold;
-                color: #404040;
-            }
-
-            QwtPlotCanvas {
-                background-color: white;
-            }
-
-            QwtPlotGrid {
-                pen: #c0c0c0;
-            }
-
-            QwtPlotCurve {
-                pen: #4040ff;
-            }
-            """
-        # plot.setStyleSheet(style)
 
         self.graphWidget = pg.PlotWidget()
         self.resize(1000, 600)
@@ -61,16 +34,24 @@ class SPC(QtWidgets.QMainWindow):
         self.setCentralWidget(self.graphWidget)
 
         self.x = list(range(100))  # 100 time points
-        self.y = [randint(0,100) for _ in range(100)]  # 100 data points
+        self.y = [randint(0, 100) for _ in range(100)]  # 100 data points
+
+        self.window_size = 20
+        self.ave_x = self.x[1:]
+        self.rolling_ave = [(self.y[i] - self.y[i-1] / 2) for i in range(1, len(self.y))]
+        # self.rolling_ave = self._moving_ave(window_size=5)
 
         # self.graphWidget.setBackground('w')
 
-        pen = pg.mkPen(color=(255, 0, 0))
-        # self.data_line = self.graphWidget.plot(self.x, self.y, pen=pen, color='green')
+        pen = pg.mkPen(color='#ffa02f', width=4)
         self.data_scatter = pg.ScatterPlotItem(pen=pg.mkPen(width=7, color='#ffa02f'), symbol='o', size=3)
+        self.data_scatter.setOpacity(0.2)
+        self.ave_line = self.graphWidget.plot(self.rolling_ave, pen=pen)
+
         self.graphWidget.addItem(self.data_scatter)
+        self.graphWidget.addItem(self.ave_line)
         self.timer = QtCore.QTimer()
-        self.timer.setInterval(50)
+        self.timer.setInterval(10)
         self.timer.timeout.connect(self.update_plot_data)
         self.timer.start()
 
@@ -101,6 +82,8 @@ class SPC(QtWidgets.QMainWindow):
         self.x = self.x[1:]  # Remove the first y element.
 
         self.y = self.y[1:]  # Remove the first
+        self.ave_x = self.ave_x[1:]
+        self.rolling_ave = self.rolling_ave[1:]
         time_total = 0
         with nidaqmx.Task() as task:
             task.ci_channels.add_ci_count_edges_chan("Dev1/ctr0")
@@ -121,3 +104,20 @@ class SPC(QtWidgets.QMainWindow):
             self.x.append(time_total)
             self.y.append(p)
             self.data_scatter.setData(self.x, self.y)
+
+            self.ave_x.append(self.x[-self.window_size])
+            self.rolling_ave.append(sum(self.y[-self.window_size:]) / self.window_size)
+            # self.rolling_ave.append(self._moving_ave(window_size=2))
+            self.ave_line.setData(self.ave_x, self.rolling_ave)
+            # self.ave_line.setData(self.rolling_ave)
+
+    def _moving_ave(self, window_size=5):
+        i = 0
+        moving_averages = []
+        while i < len(self.y) - window_size + 1:
+            window = self.y[i: i + window_size]
+            window_average = round(np.sum(window) / window_size, 2)
+            moving_averages.append(window_average)
+            i += 1
+        return moving_averages
+
