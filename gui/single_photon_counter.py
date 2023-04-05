@@ -1,5 +1,5 @@
 from PySide6 import QtWidgets, QtCore
-from PySide6.QtGui import QLinearGradient
+from PySide6.QtGui import QLinearGradient, QDoubleValidator, QIntValidator
 from pyqtgraph import PlotWidget, plot
 import pyqtgraph as pg
 import sys  # We need sys so that we can pass argv to QApplication
@@ -15,6 +15,11 @@ class SPC(QtWidgets.QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super(SPC, self).__init__(*args, **kwargs)
+
+        # Load stylesheet
+        with open(os.path.join(os.getcwd() + "\\css\\confocal.css"), 'r') as f:
+            style = f.read()
+            self.setStyleSheet(style)
 
         self.graphWidget = pg.PlotWidget()
         self.resize(1000, 600)
@@ -36,6 +41,7 @@ class SPC(QtWidgets.QMainWindow):
         self.x = list(range(100))  # 100 time points
         self.y = [randint(0, 100) for _ in range(100)]  # 100 data points
 
+        self.sample_time = 0.01
         self.window_size = 20
         self.ave_x = self.x[1:]
         self.rolling_ave = [(self.y[i] - self.y[i-1] / 2) for i in range(1, len(self.y))]
@@ -77,6 +83,49 @@ class SPC(QtWidgets.QMainWindow):
         y_axis.setTickFont(y_tick_font)
         y_axis.setPen(pg.mkPen(color='#FFFFFF'))
 
+        widget = QtWidgets.QWidget()
+        layout = QtWidgets.QGridLayout()
+        widget.setLayout(layout)
+
+        # ms_label = QtWidgets.QLabel("Sample Time (ms)")
+        # ms_form = QtWidgets.QLineEdit("Sample Time (ms)")
+
+        # Create the three form inputs and their labels
+        label_ms = QtWidgets.QLabel("Sample time (ms):")
+        input_ms = QtWidgets.QLineEdit()
+        input_ms.setValidator(QDoubleValidator())
+        label_winsize = QtWidgets.QLabel("Average Range:")
+        input_winsize = QtWidgets.QLineEdit()
+        input_winsize.setValidator(QIntValidator())
+        label3 = QtWidgets.QLabel("")
+
+        layout.addWidget(label_ms, 0, 0)
+        layout.addWidget(input_ms, 0, 1)
+        layout.addWidget(label_winsize, 0, 2)
+        layout.addWidget(input_winsize, 0, 3)
+        layout.addWidget(label3, 0, 5)
+
+        layout.addWidget(self.graphWidget, 1, 0, 1, 6)
+
+        self.setCentralWidget(widget)
+
+        # text_item = pg.TextItem(anchor=(1, 1))
+        # self.graph_widget.addItem(text_item)
+
+        # Connect a signal to input1 to store its text as a variable
+        input_ms.returnPressed.connect(lambda: self.store_sample_time(input_ms.text()))
+        input_winsize.returnPressed.connect(lambda: self.store_window_size(input_winsize.text()))
+
+        self.setLayout(layout)
+
+    def store_sample_time(self, text):
+        self.sample_time = float(text)/1000
+        print("Input 1:", self.sample_time)
+
+    def store_window_size(self, text):
+        self.window_size = int(text)
+        print("Input 2:", self.window_size)
+
     def update_plot_data(self):
 
         self.x = self.x[1:]  # Remove the first y element.
@@ -89,15 +138,14 @@ class SPC(QtWidgets.QMainWindow):
             task.ci_channels.add_ci_count_edges_chan("Dev1/ctr0")
             task.ci_channels[0].ci_count_edges_term = "/Dev1/PFI8"
 
-            sample_time = 0.01
             task.start()
-            time.sleep(sample_time)
+            time.sleep(self.sample_time)
             cnt0 = task.read()
-            time.sleep(sample_time)
+            time.sleep(self.sample_time)
 
             cnt1 = task.read()
             task.stop()
-            p = (cnt1 - cnt0) * (sample_time) ** -1
+            p = (cnt1 - cnt0) * (self.sample_time) ** -1
 
             time_total = self.x[-1] + 1
 
@@ -110,6 +158,7 @@ class SPC(QtWidgets.QMainWindow):
             # self.rolling_ave.append(self._moving_ave(window_size=2))
             self.ave_line.setData(self.ave_x, self.rolling_ave)
             # self.ave_line.setData(self.rolling_ave)
+            print(self.rolling_ave[-1])
 
     def _moving_ave(self, window_size=5):
         i = 0
