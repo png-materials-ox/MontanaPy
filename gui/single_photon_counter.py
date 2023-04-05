@@ -1,18 +1,22 @@
-from PySide6 import QtWidgets, QtCore
+from PySide6.QtWidgets import (
+    QMainWindow,
+    QWidget,
+    QGridLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+)
+from PySide6 import QtCore
 from PySide6.QtGui import QLinearGradient, QDoubleValidator, QIntValidator
-from pyqtgraph import PlotWidget, plot
 import pyqtgraph as pg
-import sys  # We need sys so that we can pass argv to QApplication
+
 import os
 from random import randint
-import time
+import numpy as np
 
 from hardware.nidaq import DAQ
 
-import pandas as pd
-import numpy as np
-
-class SPC(QtWidgets.QMainWindow):
+class SPC(QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super(SPC, self).__init__(*args, **kwargs)
@@ -23,6 +27,7 @@ class SPC(QtWidgets.QMainWindow):
             self.setStyleSheet(style)
 
         self.graphWidget = pg.PlotWidget()
+        self.graphWidget.setObjectName("graphWidget")
         self.graphWidget.setStyleSheet(style)
         self.resize(1000, 600)
 
@@ -37,19 +42,16 @@ class SPC(QtWidgets.QMainWindow):
 
         # set the background brush of the plot widget to the gradient
         self.graphWidget.setBackgroundBrush(grad)
-        # self.graphWidget.setStyleSheet(style)
         self.setCentralWidget(self.graphWidget)
 
+        # Setup the plot
         self.x = list(range(100))  # 100 time points
         self.y = [randint(0, 100) for _ in range(100)]  # 100 data points
 
         self.sample_time = 0.01
-        self.window_size = 20
+        self.window_size = 20    # for averaging
         self.ave_x = self.x[1:]
         self.rolling_ave = [(self.y[i] - self.y[i-1] / 2) for i in range(1, len(self.y))]
-        # self.rolling_ave = self._moving_ave(window_size=5)
-
-        # self.graphWidget.setBackground('w')
 
         pen = pg.mkPen(color='#ffa02f', width=4)
         self.data_scatter = pg.ScatterPlotItem(pen=pg.mkPen(width=7, color='#ffa02f'), symbol='o', size=3)
@@ -58,10 +60,19 @@ class SPC(QtWidgets.QMainWindow):
 
         self.graphWidget.addItem(self.data_scatter)
         self.graphWidget.addItem(self.ave_line)
+
+        self.textItem = pg.TextItem(anchor=(0, 2))
+        # self.graphWidget.addItem(self.textItem)
+
+        # Set the position of the TextItem
+        # self.textItem.setPos(0, 0)
+
         self.timer = QtCore.QTimer()
         self.timer.setInterval(10)
         self.timer.timeout.connect(self.update_plot_data)
         self.timer.start()
+
+
 
         # TODO Put all this into css style file
         title_style = {'color': '#FFFFFF', 'font-size': '24pt', 'font-weight': 'bold'}
@@ -85,34 +96,39 @@ class SPC(QtWidgets.QMainWindow):
         y_axis.setTickFont(y_tick_font)
         y_axis.setPen(pg.mkPen(color='#FFFFFF'))
 
-        widget = QtWidgets.QWidget()
-        layout = QtWidgets.QGridLayout()
+        widget = QWidget()
+        layout = QGridLayout()
         widget.setLayout(layout)
 
-        # ms_label = QtWidgets.QLabel("Sample Time (ms)")
-        # ms_form = QtWidgets.QLineEdit("Sample Time (ms)")
+        start_btn = QPushButton("Start")
+        start_btn.setObjectName("Start")
+        stop_btn = QPushButton("Stop")
+        stop_btn.setObjectName("Stop")
+        self.ave_label = QLabel()
+        self.ave_label.setText(str(self.rolling_ave[-1]))
 
         # Create the three form inputs and their labels
-        label_ms = QtWidgets.QLabel("Sample time (ms):")
-        input_ms = QtWidgets.QLineEdit()
+        label_ms = QLabel("Sample time (ms):")
+        input_ms = QLineEdit()
         input_ms.setValidator(QDoubleValidator())
-        label_winsize = QtWidgets.QLabel("Average Range:")
-        input_winsize = QtWidgets.QLineEdit()
+        label_winsize = QLabel("Average Range:")
+        input_winsize = QLineEdit()
         input_winsize.setValidator(QIntValidator())
-        label3 = QtWidgets.QLabel("")
+        label3 = QLabel("")
 
-        layout.addWidget(label_ms, 0, 0)
-        layout.addWidget(input_ms, 0, 1)
-        layout.addWidget(label_winsize, 0, 2)
-        layout.addWidget(input_winsize, 0, 3)
-        layout.addWidget(label3, 0, 5)
+        layout.addWidget(start_btn, 0, 0)
+        layout.addWidget(stop_btn, 0, 1)
+        layout.addWidget(self.ave_label, 0, 5)
 
-        layout.addWidget(self.graphWidget, 1, 0, 1, 6)
+        layout.addWidget(label_ms, 1, 0)
+        layout.addWidget(input_ms, 1, 1)
+        layout.addWidget(label_winsize, 1, 2)
+        layout.addWidget(input_winsize, 1, 3)
+        layout.addWidget(label3, 1, 5)
+
+        layout.addWidget(self.graphWidget, 2, 0, 2, 6)
 
         self.setCentralWidget(widget)
-
-        # text_item = pg.TextItem(anchor=(1, 1))
-        # self.graph_widget.addItem(text_item)
 
         # Connect a signal to input1 to store its text as a variable
         input_ms.returnPressed.connect(lambda: self.store_sample_time(input_ms.text()))
@@ -152,6 +168,7 @@ class SPC(QtWidgets.QMainWindow):
         self.ave_line.setData(self.ave_x, self.rolling_ave)
 
         print(self.rolling_ave[-1])
+        self.ave_label.setText(str(self.rolling_ave[-1]))
 
     def _moving_ave(self, window_size=5):
         i = 0
