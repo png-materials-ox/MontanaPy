@@ -13,8 +13,8 @@ class DAQ:
         self.ctr_chan = self.daq["counter_channels"][0]     # DAQ channel for single photon counting
         self.photon_term = self.daq["photon_sources"][0]    # Associated timing channel for single photon counting
 
-        # self.fsm_x = self.daq + "/ai0"              # Fast steering mirror x
-        # self.fsm_y = self.daq + "/ai1"              # Fast steering mirror y
+        # self.fsm_x_chan = self.daq + "/ai0"              # Fast steering mirror x
+        # self.fsm_y_chan = self.daq + "/ai1"              # Fast steering mirror y
 
     def counter(self, sample_time):
         '''
