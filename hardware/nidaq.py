@@ -17,6 +17,11 @@ class DAQ:
         # self.fsm_y = self.daq + "/ai1"              # Fast steering mirror y
 
     def counter(self, sample_time):
+        '''
+
+        :param sample_time: sampling time for the connected single photon counter (milliseconds)
+        :return: number of photon counts in one second
+        '''
         try:
             with nidaqmx.Task() as task:
                 task.ci_channels.add_ci_count_edges_chan(self.ctr_chan)
@@ -29,8 +34,8 @@ class DAQ:
 
                 cnt1 = task.read()
                 task.stop()
-                p = (cnt1 - cnt0) * (sample_time) ** -1
-                return p
+                phot_cnt = (cnt1 - cnt0) * (sample_time) ** -1
+                return phot_cnt
         except nidaqmx.DaqError as e:\
             print("An error occurred:", e)
 

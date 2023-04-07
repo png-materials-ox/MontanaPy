@@ -70,6 +70,7 @@ class MontanaPy(QWidget):
                                     "WLS",
                                     "Toptica Laser",
                                     "Single Photon Counter",
+                                    "Fast Steering Mirror",
                                     "GEM 532",
                                     "Oscilloscope",
                                     "Wavemeter",
