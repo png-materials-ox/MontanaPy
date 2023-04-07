@@ -31,7 +31,8 @@
             "gate_in_channel": "/Dev1/PFI10",
             "aom_channel": "Dev1/port0/line6",
             "eom_channel": "Dev1/port0/line5",
-
+            "fsm_x_volt_chan": "Dev1/_ao0_vs_aognd",
+            "fsm_y_volt_chan": "Dev1/_ao1_vs_aognd",
             "odmr_trigger_channel": [
                 "/Dev1/PFI0"
             ],
