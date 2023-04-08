@@ -48,11 +48,12 @@ class DAQ:
     def scan_voltage(self):
         pass
 
-    def read_analogue_voltage(self, channel="ai0", min=-10, max=10, rate=1000, n_samps=1):
+    def read_analogue_voltage(self, channels=["ai0", "ai1"], min=-10, max=10, rate=1000, n_samps=1):
         # Create a DAQ session
         with nidaqmx.Task() as task:
             # Configure the input channels
-            task.ai_channels.add_ai_voltage_chan(channel)
+            for channel in channels:
+                task.ai_channels.add_ai_voltage_chan(channel)
 
             task.ai_channels.all.ai_min = min
             task.ai_channels.all.ai_max = max
