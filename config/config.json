@@ -69,6 +69,10 @@
             "adc_voltage_range": [0, 10],
             "max_channel_samples_buffer": 10000000,
             "read_write_timeout": 10
+        },
+        "fsm": {
+            "um_per_V_x": 2258.976,
+            "um_per_V_y": 1557.688
         }
     },
     "logic": {
@@ -120,5 +124,10 @@
             "image_y_padding": 0.02,
             "image_z_padding": 0.02
         }
+    },
+    "optics" : {
+        "mag": 100,
+        "focal_length": 160,
+        "f_tele": 400
     }
 }

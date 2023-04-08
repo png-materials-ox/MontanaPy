@@ -13,13 +13,14 @@ class FSM:
         self.x_channel = self.config['hardware']['nicard']['fsm_x_volt_chan']
         self.y_channel = self.config['hardware']['nicard']['fsm_y_volt_chan']
 
-        # TODO get from config file
         # Parameters required to determine the mirror displacement voltage to image position
-        self.mag = 100              # Magnification of objective
-        self.focal_length = 160     # mm
-        self.f_tele = 400           # mm
-        self.um_per_V_x = 2258.976  # um/V
-        self.um_per_V_y = 1557.688  # u,/V
+        self.mag = self.config["optics"]["mag"]                         # Magnification of objective
+        self.focal_length = self.config["optics"]["focal_length"]       # mm
+        self.f_tele = self.config["optics"]["f_tele"]                   # mm
+        self.um_per_V_x = self.config["fsm"]["um_per_V_x"]              # um/V
+        self.um_per_V_y = self.config["fsm"]["um_per_V_y"]              # um/V
+
+
 
     def read_analogue_in(self):
         ''' This will go into the DAQ class'''
