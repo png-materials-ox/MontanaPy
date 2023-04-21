@@ -29,10 +29,13 @@
             "scanner_y_ao": "/Dev1/AO3",
             "scanner_z_ao": "/Dev1/AO2",
             "gate_in_channel": "/Dev1/PFI10",
+            "wls_channel": "Dev1/port0/line0",
             "aom_channel": "Dev1/port0/line6",
             "eom_channel": "Dev1/port0/line5",
             "fsm_x_volt_chan": "Dev1/_ao0_vs_aognd",
             "fsm_y_volt_chan": "Dev1/_ao1_vs_aognd",
+            "scan_x": "Dev1/ao0",
+            "scan_y": "Dev1/ao1",
             "odmr_trigger_channel": [
                 "/Dev1/PFI0"
             ],

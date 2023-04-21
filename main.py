@@ -2,6 +2,7 @@ import sys
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QTabWidget, QPushButton
 from gui.aom import AOM
 from gui.eom import EOM
+from gui.wls import WLS
 from gui.fast_steering_mirror import FSM
 from gui.confocal import Confocal
 from gui.single_photon_counter import SPC
@@ -132,6 +133,7 @@ class MontanaPy(QWidget):
 
         self.instrument_buttons["AOM"].clicked.connect(self._open_aom_window)
         self.instrument_buttons["EOM"].clicked.connect(self._open_eom_window)
+        self.instrument_buttons["WLS"].clicked.connect(self._open_wls_window)
         self.instrument_buttons["Single Photon Counter"].clicked.connect(self._open_spc_window)
         self.instrument_buttons["Fast Steering Mirror"].clicked.connect(self._open_fsm_window)
         self.program_buttons["Confocal"].clicked.connect(self._open_confocal_window)
@@ -177,6 +179,12 @@ class MontanaPy(QWidget):
         self.eom_window.setWindowTitle("EOM Window")
         self.eom_window.show()
         self.eom_window.setParent(None)
+
+    def _open_wls_window(self):
+        self.wls_window = WLS()
+        self.wls_window.setWindowTitle("WLS Window")
+        self.wls_window.show()
+        self.wls_window.setParent(None)
 
     def _open_confocal_window(self):
         self.confocal_window = Confocal()
