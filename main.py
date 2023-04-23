@@ -135,16 +135,25 @@ class MontanaPy(GUICore):
             style = f.read()
             self.setStyleSheet(style)
 
-        self.instrument_buttons["AOM"].clicked.connect(partial(self._open_window, AOM(), "AOM Window"))
-        self.instrument_buttons["EOM"].clicked.connect(partial(self._open_window, EOM(), "EOM Window"))
-        self.instrument_buttons["WLS"].clicked.connect(partial(self._open_window, WLS(), "WLS Window"))
-        self.instrument_buttons["Single Photon Counter"].clicked.connect(partial(self._open_window, SPC(), "SPC Window"))
-        # self.instrument_buttons["Fast Steering Mirror"].clicked.connect(partial(super()._open_window, FSM(), "FSM Window"))
-        self.program_buttons["Confocal"].clicked.connect(partial(self._open_window, Confocal(), "Confocal Window"))
+        # self.instrument_buttons["AOM"].clicked.connect(partial(self._open_window, AOM(), "AOM Window"))
+        # self.instrument_buttons["EOM"].clicked.connect(partial(self._open_window, EOM(), "EOM Window"))
+        # self.instrument_buttons["WLS"].clicked.connect(partial(self._open_window, WLS(), "WLS Window"))
+        # self.instrument_buttons["Single Photon Counter"].clicked.connect(partial(self._open_window, SPC(), "SPC Window"))
+        # # self.instrument_buttons["Fast Steering Mirror"].clicked.connect(partial(super()._open_window, FSM(), "FSM Window"))
+        # self.program_buttons["Confocal"].clicked.connect(partial(self._open_window, Confocal(), "Confocal Window"))
 
-    def _open_window(self, obj, title):
-        window = obj
-        window.setWindowTitle(title)
+        self.instrument_buttons["AOM"].clicked.connect(lambda: self._open_window(AOM(), "AOM Window"))
+        self.instrument_buttons["EOM"].clicked.connect(lambda: self._open_window(EOM(), "EOM Window"))
+        self.instrument_buttons["WLS"].clicked.connect(lambda: self._open_window(WLS(), "WLS Window"))
+        self.instrument_buttons["Single Photon Counter"].clicked.connect(
+            lambda: self._open_window(SPC(), "SPC Window"))
+        self.instrument_buttons["Fast Steering Mirror"].clicked.connect(
+            lambda: super()._open_window(FSM(), "FSM Window"))
+        self.program_buttons["Confocal"].clicked.connect(lambda: self._open_window(Confocal(), "Confocal Window"))
+
+        def _open_window(self, obj, title):
+            window = obj
+            window.setWindowTitle(title)
         window.show()
         window.setParent(None)
 
