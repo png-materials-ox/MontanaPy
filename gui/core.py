@@ -15,3 +15,9 @@ class GUICore(QWidget):
         button.setObjectName(name)
         layout.addWidget(button)
         return button
+
+    # def _open_window(self, obj, title):
+    #     window = obj
+    #     window.setWindowTitle(title)
+    #     window.show()
+    #     window.setParent(None)
