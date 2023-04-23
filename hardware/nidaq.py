@@ -125,6 +125,7 @@ class DAQ:
 
             :return: None
             """
+        print('hello')
         with self._open_task() as task:
             task.ao_channels.add_ao_voltage_chan(self.fsm_x_chan_o)
             task.ao_channels.add_ao_voltage_chan(self.fsm_y_chan_o)
@@ -147,6 +148,7 @@ class DAQ:
 
             task.stop()
             task.wait_until_done(timeout=nidaqmx.constants.WAIT_INFINITELY)
+        print("Bye")
 
     def read_analogue_voltage(self, channels=["ai0", "ai1"], min=-10, max=10, rate=1000, n_samps=1):
         # Create a DAQ session
