@@ -93,7 +93,7 @@ class MontanaPy(GUICore):
 
         self.instrument_buttons = {}
         for name in self._instrument_options:
-            self.instrument_buttons["%s" % name] = self._create_instr_button(name)
+            self.instrument_buttons["%s" % name] = super()._create_button(name, self.instruments_layout)
 
         self.instruments_layout.addStretch()
         self.instruments_tab.setLayout(self.instruments_layout)
@@ -103,7 +103,7 @@ class MontanaPy(GUICore):
 
         self.program_buttons = {}
         for name in self._program_options:
-            self.program_buttons["%s" % name] = self._create_prog_button(name)
+            self.program_buttons["%s" % name] = super()._create_button(name, self.programs_layout)
 
         self.programs_layout.addStretch()
         self.programs_tab.setLayout(self.programs_layout)
@@ -113,7 +113,7 @@ class MontanaPy(GUICore):
 
         self.analysis_buttons = {}
         for name in self._analysis_options:
-            self.analysis_buttons["%s" % name] = self._create_analysis_button(name)
+            self.analysis_buttons["%s" % name] = super()._create_button(name, self.analysis_layout)
 
         self.analysis_layout.addStretch()
         self.analysis_tab.setLayout(self.analysis_layout)
@@ -139,23 +139,23 @@ class MontanaPy(GUICore):
         self.instrument_buttons["Fast Steering Mirror"].clicked.connect(self._open_fsm_window)
         self.program_buttons["Confocal"].clicked.connect(self._open_confocal_window)
 
-    def _create_instr_button(self, name):
-        button = QPushButton(name)
-        button.setObjectName(name)
-        self.instruments_layout.addWidget(button)
-        return button
+    # def _create_instr_button(self, name):
+    #     button = QPushButton(name)
+    #     button.setObjectName(name)
+    #     self.instruments_layout.addWidget(button)
+    #     return button
 
-    def _create_prog_button(self, name):
-        button = QPushButton(name)
-        button.setObjectName(name)
-        self.programs_layout.addWidget(button)
-        return button
-
-    def _create_analysis_button(self, name):
-        button = QPushButton(name)
-        button.setObjectName(name)
-        self.analysis_layout.addWidget(button)
-        return button
+    # def _create_prog_button(self, name):
+    #     button = QPushButton(name)
+    #     button.setObjectName(name)
+    #     self.programs_layout.addWidget(button)
+    #     return button
+    #
+    # def _create_analysis_button(self, name):
+    #     button = QPushButton(name)
+    #     button.setObjectName(name)
+    #     self.analysis_layout.addWidget(button)
+    #     return button
 
     def _open_aom_window(self):
         self.aom_window = AOM()
