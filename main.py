@@ -30,23 +30,6 @@ class MontanaPy(GUICore):
     Methods
     -------
 
-    _create_instr_button(name)
-        Creates buttons in the main GUI for the instument panel
-
-    _create_prog_button(name)
-        Creates buttons in the main GUI for the program panel
-
-    _create_analysis_button(name)
-        Creates buttons in the main GUI for the analysis panel
-
-    _open_aom_window()
-        Opens the AOM instrument control window
-
-    _open_eom_window()
-        Opens the EOM instrument control window
-
-    _open_confocal_window()
-        Opens the Confocal program windwow
     """
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -132,48 +115,12 @@ class MontanaPy(GUICore):
             style = f.read()
             self.setStyleSheet(style)
 
-        self.instrument_buttons["AOM"].clicked.connect(self._open_aom_window)
-        self.instrument_buttons["EOM"].clicked.connect(self._open_eom_window)
-        self.instrument_buttons["WLS"].clicked.connect(self._open_wls_window)
-        self.instrument_buttons["Single Photon Counter"].clicked.connect(self._open_spc_window)
-        self.instrument_buttons["Fast Steering Mirror"].clicked.connect(self._open_fsm_window)
-        self.program_buttons["Confocal"].clicked.connect(self._open_confocal_window)
-
-    def _open_aom_window(self):
-        self.aom_window = AOM()
-        self.aom_window.setWindowTitle("AOM Window")
-        self.aom_window.show()
-        self.aom_window.setParent(None)
-
-    def _open_spc_window(self):
-        self.spc_window = SPC()
-        self.spc_window.setWindowTitle("SPC Window")
-        self.spc_window.show()
-        self.spc_window.setParent(None)
-
-    def _open_fsm_window(self):
-        self.fsm_window = FSM()
-        self.fsm_window.setWindowTitle("FSM Window")
-        self.fsm_window.show()
-        self.fsm_window.setParent(None)
-
-    def _open_eom_window(self):
-        self.eom_window = EOM()
-        self.eom_window.setWindowTitle("EOM Window")
-        self.eom_window.show()
-        self.eom_window.setParent(None)
-
-    def _open_wls_window(self):
-        self.wls_window = WLS()
-        self.wls_window.setWindowTitle("WLS Window")
-        self.wls_window.show()
-        self.wls_window.setParent(None)
-
-    def _open_confocal_window(self):
-        self.confocal_window = Confocal()
-        self.confocal_window.setWindowTitle("Confocal Window")
-        self.confocal_window.show()
-        self.confocal_window.setParent(None)
+        self.instrument_buttons["AOM"].clicked.connect(lambda: self._open_window(self, AOM(), "AOM Window"))
+        self.instrument_buttons["EOM"].clicked.connect(lambda: self._open_window(self, EOM(), "EOM Window"))
+        self.instrument_buttons["WLS"].clicked.connect(lambda: self._open_window(self, WLS(), "WLS Window"))
+        self.instrument_buttons["Single Photon Counter"].clicked.connect(lambda: self._open_window(self, SPC(), "SPC Window"))
+        self.instrument_buttons["Fast Steering Mirror"].clicked.connect(lambda: self._open_window(self, FSM(), "FSM Window"))
+        self.program_buttons["Confocal"].clicked.connect(lambda: self._open_window(self, Confocal(), "Confocal Window"))
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

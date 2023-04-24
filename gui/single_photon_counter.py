@@ -15,6 +15,7 @@ from random import randint
 import numpy as np
 
 from hardware.nidaq import DAQ
+from gui.core import GUICore
 
 class SPC(QMainWindow):
 
@@ -32,13 +33,7 @@ class SPC(QMainWindow):
         self.resize(1000, 600)
 
         # create a linear gradient for the background color
-        # TODO Put into css style file
-        grad = QLinearGradient(0, 0, 0, self.graphWidget.height())
-        grad.setColorAt(0, pg.mkColor('#565656'))
-        grad.setColorAt(0.1, pg.mkColor('#525252'))
-        grad.setColorAt(0.5, pg.mkColor('#4e4e4e'))
-        grad.setColorAt(0.9, pg.mkColor('#4a4a4a'))
-        grad.setColorAt(1, pg.mkColor('#464646'))
+        grad = GUICore._gradient_plot_backround(self.graphWidget)
 
         # set the background brush of the plot widget to the gradient
         self.graphWidget.setBackgroundBrush(grad)

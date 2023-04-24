@@ -16,6 +16,31 @@ from gui.core import GUICore
 
 import numpy as np
 
+class ScanThread(QThread):
+    def __init__(self, fsm, x, y, x_rate, y_rate):
+        super().__init__()
+        self.stop_flag = False
+        self.fsm = fsm
+        self.x = x
+        self.y = y
+        self.x_rate = x_rate
+        self.y_rate = y_rate
+
+    def run(self):
+        self.fsm.scan_xy(x=self.x, y=self.y, x_rate=self.x_rate, y_rate=self.y_rate)
+
+# class PlotFSMThread(QThread):
+#     def __init__(self, fsm):
+#         super().__init__()
+#         self.stop_flag = False
+#         self.fsm = fsm
+#
+#     def run(self):
+#         self.fsm.scan_xy(x=self.x, y=self.y, x_rate=self.x_rate, y_rate=self.y_rate)
+
+    # def stop(self):
+    #     self.stop_event.set()
+
 
 class FSM(GUICore):
     def __init__(self):
@@ -57,7 +82,9 @@ class FSM(GUICore):
 
         x = list(np.linspace(0.001, 0.1, 501))
         y = list(np.linspace(0.001, 0.1, 501))
-        start_button.clicked.connect(lambda: self.fsm.scan_xy(x=x, y=y, x_rate=10, y_rate=10))
+        self.scan_thread = ScanThread(self.fsm, x, y, 1, 1)
+        start_button.clicked.connect(self.scan_thread.start)
+        # start_button.clicked.connect(lambda: self.fsm.scan_xy(x=x, y=y, x_rate=10, y_rate=10))
 
         #########################################################
         #### Forms for displaying the FSM x and y positions #####
@@ -128,11 +155,3 @@ class FSM(GUICore):
 
         # Update the plot
         self.plot_widget.plot([self.pos_x], [self.pos_y], pen=None, symbol='o', symbolPen='r', clear=True)
-
-
-class WorkerThread(QThread):
-    def __init__(self):
-        super().__init__()
-
-    def run(self):
-        pass
