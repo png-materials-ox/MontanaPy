@@ -10,7 +10,8 @@ class GUICore(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-    def _create_button(self, name, layout):
+    @staticmethod
+    def _create_button(name, layout):
         button = QPushButton(name)
         button.setObjectName(name)
         layout.addWidget(button)

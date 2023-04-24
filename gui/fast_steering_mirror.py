@@ -13,11 +13,12 @@ from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QLinearGradient
 import hardware.newport_fsm as nfsm
 import pyqtgraph as pg
+from gui.core import GUICore
 import time
 import numpy as np
 
 
-class FSM(QWidget):
+class FSM(GUICore):
     def __init__(self):
         super().__init__()
 
@@ -49,9 +50,9 @@ class FSM(QWidget):
         self.button_box.addWidget(self.grpbutt1)
         self.button_box.addWidget(self.grpbutt2)
 
-        x = list(np.linspace(0.001, 0.002, 11))
-        y = list(np.linspace(0.001, 0.002, 11))
-        start_button.clicked.connect(self.fsm.scan_xy(x=x, y=y, x_rate=10, y_rate=10))
+        x = list(np.linspace(0.001, 0.1, 501))
+        y = list(np.linspace(0.001, 0.1, 501))
+        start_button.clicked.connect(lambda: self.fsm.scan_xy(x=x, y=y, x_rate=10, y_rate=10))
 
         #
         # Create group boxes to hold the values and the plot

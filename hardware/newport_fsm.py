@@ -34,4 +34,8 @@ class FSM:
         return vin * ((self.focal_length / self.mag) * (um_per_V / self.f_tele))
 
     def scan_xy(self, x=[], y=[], x_rate=1, y_rate=1):
+        print(x)
+        print(y)
+        print(x_rate)
+        print(y_rate)
         self.daq.scan_xy(x_waveform=x, y_waveform=y, x_rate=x_rate, y_rate=y_rate)
