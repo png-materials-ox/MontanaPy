@@ -906,3 +906,66 @@
 2023-04-24 23:36:32,193 INFO:Plotting FSM
 2023-04-24 23:36:32,400 INFO:Plotting FSM
 2023-04-24 23:36:32,406 INFO:Plotting FSM
+2023-04-24 23:39:00,612 INFO:ScanThread called
+2023-04-24 23:39:00,612 INFO:PlotThread called
+2023-04-24 23:39:00,630 INFO:FSM Window Opened
+2023-04-24 23:39:04,443 INFO:FSM start button clicked
+2023-04-24 23:39:04,446 INFO:ScanThread run
+2023-04-24 23:39:04,446 INFO:PlotThread run
+2023-04-24 23:41:02,142 INFO:ScanThread called
+2023-04-24 23:41:02,142 INFO:PlotThread called
+2023-04-24 23:41:02,158 INFO:FSM Window Opened
+2023-04-24 23:41:28,085 INFO:ScanThread called
+2023-04-24 23:41:28,085 INFO:PlotThread called
+2023-04-24 23:41:28,102 INFO:FSM Window Opened
+2023-04-24 23:41:29,508 INFO:FSM start button clicked
+2023-04-24 23:41:29,510 INFO:ScanThread run
+2023-04-24 23:41:29,510 INFO:PlotThread run
+2023-04-24 23:42:13,906 INFO:ScanThread called
+2023-04-24 23:42:13,906 INFO:PlotThread called
+2023-04-24 23:42:13,923 INFO:FSM Window Opened
+2023-04-24 23:42:16,814 INFO:FSM start button clicked
+2023-04-24 23:42:16,816 INFO:ScanThread run
+2023-04-24 23:42:16,816 INFO:PlotThread run
+2023-04-24 23:54:17,894 INFO:ScanThread called
+2023-04-24 23:54:17,894 INFO:PlotThread called
+2023-04-24 23:54:17,910 INFO:FSM Window Opened
+2023-04-24 23:54:19,211 INFO:FSM start button clicked
+2023-04-24 23:54:19,213 INFO:ScanThread run
+2023-04-24 23:54:19,213 INFO:PlotThread run
+2023-04-24 23:54:22,172 INFO:FSM stop button clicked
+2023-04-24 23:54:25,180 INFO:FSM stop button clicked
+2023-04-24 23:54:25,478 INFO:FSM stop button clicked
+2023-04-24 23:54:25,697 INFO:FSM stop button clicked
+2023-04-24 23:57:17,972 INFO:ScanThread called
+2023-04-24 23:57:17,973 INFO:PlotThread called
+2023-04-24 23:57:17,988 INFO:FSM Window Opened
+2023-04-24 23:57:19,671 INFO:FSM start button clicked
+2023-04-24 23:57:19,673 INFO:ScanThread run
+2023-04-24 23:57:19,674 INFO:PlotThread run
+2023-04-24 23:57:22,652 INFO:FSM stop button clicked
+2023-04-24 23:57:22,664 INFO:ScanThread stopped
+2023-04-24 23:59:52,160 INFO:ScanThread called
+2023-04-24 23:59:52,160 INFO:PlotThread called
+2023-04-24 23:59:52,177 INFO:FSM Window Opened
+2023-04-24 23:59:53,673 INFO:FSM start button clicked
+2023-04-24 23:59:53,675 INFO:ScanThread run
+2023-04-24 23:59:53,676 INFO:PlotThread run
+2023-04-24 23:59:59,244 INFO:FSM stop button clicked
+2023-04-24 23:59:59,252 INFO:PlotThread stopped
+2023-04-25 00:01:13,155 INFO:ScanThread called
+2023-04-25 00:01:13,155 INFO:PlotThread called
+2023-04-25 00:01:13,172 INFO:FSM Window Opened
+2023-04-25 00:01:14,505 INFO:FSM start button clicked
+2023-04-25 00:01:14,507 INFO:ScanThread run
+2023-04-25 00:01:14,507 INFO:PlotThread run
+2023-04-25 00:01:18,720 INFO:FSM stop button clicked
+2023-04-25 00:01:18,731 INFO:PlotThread stopped
+2023-04-25 00:01:22,555 INFO:FSM start button clicked
+2023-04-25 00:01:22,557 INFO:ScanThread run
+2023-04-25 00:01:22,557 INFO:PlotThread run
+2023-04-25 00:01:22,557 INFO:PlotThread stopped
+2023-04-25 00:01:25,439 INFO:FSM start button clicked
+2023-04-25 00:01:25,440 INFO:ScanThread run
+2023-04-25 00:01:25,440 INFO:PlotThread run
+2023-04-25 00:01:25,441 INFO:PlotThread stopped
