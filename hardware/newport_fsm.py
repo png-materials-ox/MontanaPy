@@ -33,5 +33,5 @@ class FSM:
     def voltage_to_position(self, vin, um_per_V):
         return vin * ((self.focal_length / self.mag) * (um_per_V / self.f_tele))
 
-    def scan_xy(self, x=[], y=[], x_rate=1, y_rate=1):
-        self.daq.scan_xy(x_waveform=x, y_waveform=y, x_rate=x_rate, y_rate=y_rate)
+    def scan_xy(self, x=[], y=[], dwell_ms=10):
+        self.daq.scan_xy(x_waveform=x, y_waveform=y, dwell_ms=dwell_ms)

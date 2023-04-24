@@ -17,26 +17,32 @@ from gui.core import GUICore
 import numpy as np
 
 class ScanThread(QThread):
-    def __init__(self, fsm, x, y, x_rate, y_rate):
+    def __init__(self, fsm, x, y, dwell_ms):
         super().__init__()
         self.stop_flag = False
         self.fsm = fsm
         self.x = x
         self.y = y
-        self.x_rate = x_rate
-        self.y_rate = y_rate
+        self.dwell_ms = dwell_ms
+
+        # self.plot_updated = Signal(float, float)
 
     def run(self):
-        self.fsm.scan_xy(x=self.x, y=self.y, x_rate=self.x_rate, y_rate=self.y_rate)
+        self.fsm.scan_xy(x=self.x, y=self.y, dwell_ms=self.dwell_ms)
+        print(4)
 
-# class PlotFSMThread(QThread):
-#     def __init__(self, fsm):
-#         super().__init__()
-#         self.stop_flag = False
-#         self.fsm = fsm
-#
-#     def run(self):
-#         self.fsm.scan_xy(x=self.x, y=self.y, x_rate=self.x_rate, y_rate=self.y_rate)
+        # self.plot_updated.emit(*self.fsm.get_position())
+
+class PlotFSMThread(QThread):
+    def __init__(self, fsm, x, y, dwell_ms):
+        super().__init__()
+        self.fsm = fsm
+        self.x = x
+        self.y = y
+        self.dwell_ms = dwell_ms
+
+    def run(self):
+        self.fsm.update_fsm_plot(self.x, self.y, self.dwell_ms)
 
     # def stop(self):
     #     self.stop_event.set()
@@ -80,10 +86,13 @@ class FSM(GUICore):
         #### Forms for Scan Settings ####
         #################################
 
-        x = list(np.linspace(0.001, 0.1, 501))
-        y = list(np.linspace(0.001, 0.1, 501))
-        self.scan_thread = ScanThread(self.fsm, x, y, 1, 1)
-        start_button.clicked.connect(self.scan_thread.start)
+        # x = list(np.linspace(0.001, 0.1, 101))
+        # y = list(np.linspace(0.001, 0.1, 101))
+        x = [i * 0.0001 for i in range(101)]
+        y = [i * 0.0001 for i in range(101)]
+        self.scan_thread = ScanThread(self.fsm, x, y, 100)
+        self.plot_thread = PlotFSMThread(self, x, y, 100)
+        start_button.clicked.connect(lambda: self._on_click(self.scan_thread, self.plot_thread))
         # start_button.clicked.connect(lambda: self.fsm.scan_xy(x=x, y=y, x_rate=10, y_rate=10))
 
         #########################################################
@@ -124,6 +133,8 @@ class FSM(GUICore):
         #### Setup the plot ####
         ########################
         self.plot_widget = pg.PlotWidget()
+        self.plot_widget.setXRange(min(x), max(x), padding=0)
+        self.plot_widget.setXRange(min(y),max(y), padding=0)
         grad = GUICore._gradient_plot_backround(self.plot_widget)
 
         # set the background brush of the plot widget to the gradient
@@ -148,10 +159,20 @@ class FSM(GUICore):
 
         self.show()
 
+    def _on_click(self, scan_thread, plot_thread):
+        print(1)
+        scan_thread.start()
+        plot_thread.start()
+        print(2)
+        # self.plot_thread.start
+
+
     def update_position(self):
         self.pos_x, self.pos_y = self.fsm.get_position()
         self.label1.setText(str(self.pos_x))
         self.label2.setText(str(self.pos_y))
 
-        # Update the plot
-        self.plot_widget.plot([self.pos_x], [self.pos_y], pen=None, symbol='o', symbolPen='r', clear=True)
+    def update_fsm_plot(self, x, y, dwell_ms):
+        for i in range(len(x)):
+            for j in range(len(y)):
+                self.plot_widget.plot([y[j]], [x[i]], pen=None, symbol='o', symbolPen='r', clear=True)

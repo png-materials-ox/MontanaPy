@@ -98,7 +98,7 @@ class DAQ:
     def scan_voltage(self):
         pass
 
-    def scan_xy(self, x_waveform=[], y_waveform=[], x_rate=1, y_rate=1):
+    def scan_xy(self, x_waveform=[], y_waveform=[], dwell_ms=10):
         """
             Generates a two-dimensional waveform using the x and y waveform inputs and scans it using
             the nidaqmx.Task object in a finite acquisition mode. The function opens the Task
@@ -131,19 +131,20 @@ class DAQ:
             task.ao_channels.all.ao_max = 10 #TODO put in config file
             task.ao_channels.all.ao_min = -10
 
-            task.timing.cfg_samp_clk_timing(
-                rate=max(x_rate, y_rate),
-                sample_mode=AcquisitionType.FINITE,
-                samps_per_chan=len(x_waveform) + len(y_waveform)
-            )
+            # task.timing.cfg_samp_clk_timing(
+            #     rate=max(x_rate, y_rate),
+            #     sample_mode=AcquisitionType.FINITE,
+            #     samps_per_chan=len(x_waveform) + len(y_waveform)
+            # )
 
             task.start()
             for i in range(len(x_waveform)):
-                xloop = list(x_waveform[i] * np.ones(len(x_waveform)))
-                task.write(
-                    [xloop, y_waveform],
-                    auto_start=False
-                )
+                for j in range(len(y_waveform)):
+                    task.write(
+                        [x_waveform[i], y_waveform[j]],
+                        auto_start=False
+                    )
+                    time.sleep(dwell_ms/1000)
 
             task.stop()
             task.wait_until_done(timeout=nidaqmx.constants.WAIT_INFINITELY)
