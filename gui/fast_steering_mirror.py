@@ -6,9 +6,11 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QGroupBox,
-    QPushButton
+    QPushButton,
+    QLineEdit
 )
 from PySide6.QtCore import Qt, QTimer, QThread, QObject, Signal, Slot
+from PySide6.QtGui import QDoubleValidator, QIntValidator
 import pyqtgraph as pg
 
 import hardware.newport_fsm as nfsm
@@ -91,8 +93,7 @@ class FSM(GUICore):
         self.setWindowTitle("Display Values and Plot")
         self.setGeometry(100, 100, 400, 300)
 
-        # x = list(np.linspace(0.001, 0.1, 101))
-        # y = list(np.linspace(0.001, 0.1, 101))
+
         x = [i * 0.001 for i in range(101)]
         y = [i * 0.001 for i in range(101)]
         dwell_ms = 10
@@ -174,13 +175,39 @@ class FSM(GUICore):
         hbox.addWidget(self.groupbox1)
         hbox.addWidget(self.groupbox2)
 
+        # Create the three form inputs and their labels
+        label_ms, input_ms = super()._create_label("Dwell time (ms)", "int")
+        label_xsteps, input_xsteps = super()._create_label("X steps", "int")
+        label_ysteps, input_ysteps = super()._create_label("Y steps", "int")
+        label_roi, input_roi = super()._create_label("ROI", "int")
+
+        label_box = QHBoxLayout()
+        label_box.addWidget(label_ms)
+        label_box.addWidget(input_ms)
+        label_box.addWidget(label_xsteps)
+        label_box.addWidget(input_xsteps)
+        label_box.addWidget(label_ysteps)
+        label_box.addWidget(input_ysteps)
+        label_box.addWidget(label_roi)
+        label_box.addWidget(input_roi)
+
         ########################################
         #### Create a grid layout container ####
         ########################################
         grid_layout = QGridLayout()
-        grid_layout.addLayout(self.button_box, 0, 0)
-        grid_layout.addLayout(hbox, 1, 0)
-        grid_layout.addWidget(self.plot_widget, 2, 0)
+
+        # grid_layout.addWidget(label_ms, 0, 0)
+        # grid_layout.addWidget(input_ms, 0, 1)
+        # grid_layout.addWidget(label_xsteps, 1, 0)
+        # grid_layout.addWidget(input_xsteps, 1, 1)
+        # grid_layout.addWidget(label_ysteps, 1, 2)
+        # grid_layout.addWidget(input_ysteps, 1, 3)
+        # grid_layout.addWidget(label_roi, 1, 4)
+        # grid_layout.addWidget(input_roi, 1, 5)
+        grid_layout.addLayout(label_box, 0, 0)
+        grid_layout.addLayout(self.button_box, 1, 0, 1, 2)
+        grid_layout.addLayout(hbox, 2, 0, 1, 2)
+        grid_layout.addWidget(self.plot_widget, 3, 0, 2, 2)
 
         # Set the layout for the widget
         self.setLayout(grid_layout)
@@ -193,6 +220,28 @@ class FSM(GUICore):
 
         self.show()
 
+        # Connect a signal to input1 to store its text as a variable
+        input_ms.returnPressed.connect(lambda: self._store_dwell_time(input_ms.text(10)))
+        input_xsteps.returnPressed.connect(lambda: self._store_xsteps(input_xsteps.text(250)))
+        input_ysteps.returnPressed.connect(lambda: self._store_ysteps(input_ysteps.text(250)))
+        input_roi.returnPressed.connect(lambda: self._store_roi(input_roi.text(60)))
+
+    @staticmethod
+    def _store_dwell_time(self, text):
+        self.dwell_time = float(text) / 1000
+
+    @staticmethod
+    def _store_xsteps(self, text):
+        self.xsteps = float(text)
+
+    @staticmethod
+    def _store_ysteps(self, text):
+        self.ysteps = float(text)
+
+    @staticmethod
+    def _store_roi(self, text):
+        self.ysteps = float(text)
+
     def update_position(self):
         self.pos_x, self.pos_y = self.fsm.get_position()
         self.label1.setText(str(self.pos_x))
@@ -200,7 +249,7 @@ class FSM(GUICore):
 
     @Slot(list, list)
     def update_plot(self, x, y):
-        self.plot_widget.plot(x, y, pen=None, symbol='o', symbolPen='r', clear=True)
+        self.plot_widget.plot(x, y, pen=pg.mkPen(width=7, color='#ffa02f'), symbol='o', symbolPen='#ffa02f', clear=True)
 
     def _on_start_click(self):
         logging.info('FSM start button clicked')

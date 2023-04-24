@@ -1,11 +1,13 @@
 from PySide6.QtWidgets import (
     QApplication,
     QWidget,
+    QLabel,
     QVBoxLayout,
     QTabWidget,
-    QPushButton
+    QPushButton,
+    QLineEdit
 )
-from PySide6.QtGui import QLinearGradient
+from PySide6.QtGui import QLinearGradient, QDoubleValidator, QIntValidator
 from PySide6.QtCore import Qt, QTimer
 import pyqtgraph as pg
 from contextlib import contextmanager
@@ -24,6 +26,16 @@ class GUICore(QWidget):
         button.setObjectName(name)
         layout.addWidget(button)
         return button
+
+    @staticmethod
+    def _create_label(name, validator):
+        label = QLabel(name)
+        input = QLineEdit()
+        if validator == 'int':
+            input.setValidator(QIntValidator())
+        elif validator == 'double':
+            input.setValidator(QDoubleValidator())
+        return (label, input)
 
     @staticmethod
     def _gradient_plot_backround(plot_widget):
