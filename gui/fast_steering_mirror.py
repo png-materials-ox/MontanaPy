@@ -14,6 +14,8 @@ import pyqtgraph as pg
 import hardware.newport_fsm as nfsm
 from gui.core import GUICore
 
+import time
+
 import logging
 
 logging.basicConfig(filename='log/log.log', level=logging.DEBUG,
@@ -42,9 +44,9 @@ class ScanThread(QThread):
         # self.plot_updated.emit(*self.fsm.get_position())
 
 class PlotFSMThread(QThread):
-    def __init__(self, fsm, x, y, dwell_ms):
+    def __init__(self, plot_widget, x, y, dwell_ms):
         super().__init__()
-        self.fsm = fsm
+        self.plot_widget = plot_widget
         self.x = x
         self.y = y
         self.dwell_ms = dwell_ms
@@ -52,9 +54,14 @@ class PlotFSMThread(QThread):
         logging.info('PlotThread called')
 
     def run(self):
-        self.fsm.update_fsm_plot(self.x, self.y, self.dwell_ms)
+        self.update_fsm_plot()
         logging.info('PlotThread run')
 
+    def update_fsm_plot(self):
+        for i in range(len(self.x)):
+            for j in range(len(self.y)):
+                self.plot_widget.plot([self.y[j]], [self.x[i]], pen=None, symbol='o', symbolPen='r', clear=True)
+                time.sleep(self.dwell_ms)
     # def stop(self):
     #     self.stop_event.set()
 
@@ -67,6 +74,8 @@ class FSM(GUICore):
         with open("css/fast_steering_mirror.css", "r") as f:
             style = f.read()
             self.setStyleSheet(style)
+
+        self.plot_widget = pg.PlotWidget()
 
         # Set the window properties
         self.setWindowTitle("Display Values and Plot")
@@ -99,12 +108,11 @@ class FSM(GUICore):
 
         # x = list(np.linspace(0.001, 0.1, 101))
         # y = list(np.linspace(0.001, 0.1, 101))
-        x = [i * 0.0001 for i in range(101)]
-        y = [i * 0.0001 for i in range(101)]
+        x = [i * 0.001 for i in range(101)]
+        y = [i * 0.001 for i in range(101)]
         self.scan_thread = ScanThread(self.fsm, x, y, 100)
-        self.plot_thread = PlotFSMThread(self, x, y, 100)
-        start_button.clicked.connect(lambda: self._on_click(self.scan_thread, self.plot_thread))
-        # start_button.clicked.connect(lambda: self.fsm.scan_xy(x=x, y=y, x_rate=10, y_rate=10))
+        self.plot_thread = PlotFSMThread(self.plot_widget, x, y, 100)
+        start_button.clicked.connect(self.on_start_click)
 
         #########################################################
         #### Forms for displaying the FSM x and y positions #####
@@ -143,7 +151,7 @@ class FSM(GUICore):
         ########################
         #### Setup the plot ####
         ########################
-        self.plot_widget = pg.PlotWidget()
+
         self.plot_widget.setXRange(min(x), max(x), padding=0)
         self.plot_widget.setXRange(min(y),max(y), padding=0)
         grad = GUICore._gradient_plot_backround(self.plot_widget)
@@ -170,20 +178,17 @@ class FSM(GUICore):
 
         self.show()
 
-    def _on_click(self, scan_thread, plot_thread):
-        print(1)
-        scan_thread.start()
-        plot_thread.start()
-        print(2)
-        # self.plot_thread.start
-
-
     def update_position(self):
         self.pos_x, self.pos_y = self.fsm.get_position()
         self.label1.setText(str(self.pos_x))
         self.label2.setText(str(self.pos_y))
 
-    def update_fsm_plot(self, x, y, dwell_ms):
-        for i in range(len(x)):
-            for j in range(len(y)):
-                self.plot_widget.plot([y[j]], [x[i]], pen=None, symbol='o', symbolPen='r', clear=True)
+    def _on_start_click(self):
+        logging.info('FSM start button clicked')
+        self.scan_thread.start()
+        self.plot_thread.start()
+
+    # def _on_stop_click(self):
+    #     logging.info('FSM stop button clicked')
+    #     self.scan_thread.stop()
+    #     self.plot_thread.stop()
