@@ -8,6 +8,7 @@ from gui.fast_steering_mirror import FSM
 from gui.confocal import Confocal
 from gui.single_photon_counter import SPC
 
+import logging
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -33,6 +34,9 @@ class MontanaPy(GUICore):
     """
     def __init__(self, parent=None):
         super().__init__(parent)
+
+        logging.basicConfig(filename='log/log.log', level=logging.DEBUG,
+                            format='%(asctime)s %(levelname)s:%(message)s')
 
         self.windows = []
 

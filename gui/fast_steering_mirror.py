@@ -14,11 +14,19 @@ import pyqtgraph as pg
 import hardware.newport_fsm as nfsm
 from gui.core import GUICore
 
+import logging
+
+logging.basicConfig(filename='log/log.log', level=logging.DEBUG,
+                            format='%(asctime)s %(levelname)s:%(message)s')
+
 import numpy as np
 
 class ScanThread(QThread):
     def __init__(self, fsm, x, y, dwell_ms):
         super().__init__()
+
+        logging.info('ScanThread called')
+
         self.stop_flag = False
         self.fsm = fsm
         self.x = x
@@ -29,7 +37,7 @@ class ScanThread(QThread):
 
     def run(self):
         self.fsm.scan_xy(x=self.x, y=self.y, dwell_ms=self.dwell_ms)
-        print(4)
+        logging.info('ScanThread run')
 
         # self.plot_updated.emit(*self.fsm.get_position())
 
@@ -41,8 +49,11 @@ class PlotFSMThread(QThread):
         self.y = y
         self.dwell_ms = dwell_ms
 
+        logging.info('PlotThread called')
+
     def run(self):
         self.fsm.update_fsm_plot(self.x, self.y, self.dwell_ms)
+        logging.info('PlotThread run')
 
     # def stop(self):
     #     self.stop_event.set()

@@ -10,9 +10,13 @@ from PySide6.QtCore import Qt, QTimer
 import pyqtgraph as pg
 from contextlib import contextmanager
 
+import logging
+
 class GUICore(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        logging.basicConfig(filename='log/log.log', level=logging.DEBUG,
+                            format='%(asctime)s %(levelname)s:%(message)s')
 
     @staticmethod
     def _create_button(name, layout):
@@ -37,6 +41,7 @@ class GUICore(QWidget):
         self.window.setWindowTitle(title)
         self.window.show()
         self.window.setParent(None)
+        logging.info(f'{title} Opened')
 
     @contextmanager
     def qtimer(self, func, interval):
