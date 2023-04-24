@@ -1,4 +1,3 @@
-import sys
 from PySide6.QtWidgets import (
     QApplication,
     QGridLayout,
@@ -9,12 +8,12 @@ from PySide6.QtWidgets import (
     QGroupBox,
     QPushButton
 )
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QLinearGradient
-import hardware.newport_fsm as nfsm
+from PySide6.QtCore import Qt, QTimer, QThread, Signal
 import pyqtgraph as pg
+
+import hardware.newport_fsm as nfsm
 from gui.core import GUICore
-import time
+
 import numpy as np
 
 
@@ -27,37 +26,44 @@ class FSM(GUICore):
             style = f.read()
             self.setStyleSheet(style)
 
-        # Buttons for starting and stopping FSM scan
+        # Set the window properties
+        self.setWindowTitle("Display Values and Plot")
+        self.setGeometry(100, 100, 400, 300)
+
+        ####################################################
+        #### Buttons for starting and stopping FSM scan ####
+        ####################################################
         self.fsm = nfsm.FSM()
 
-        self.grpbutt1 = QGroupBox()
-        self.grpbutt2 = QGroupBox()
+        self.button_grp1 = QGroupBox()
+        self.button_grp2 = QGroupBox()
 
         self.start_button_box = QVBoxLayout()
-        start_button = QPushButton('Scan')
-        start_button.setObjectName('Scan')
-        self.start_button_box.addWidget(start_button)
+        start_button = super()._create_button('Scan', self.start_button_box)
 
         self.stop_button_box = QVBoxLayout()
-        stop_button = QPushButton('Stop')
-        stop_button.setObjectName('Stop')
-        self.stop_button_box.addWidget(stop_button)
+        stop_button = super()._create_button('Stop', self.stop_button_box)
 
-        self.grpbutt1.setLayout(self.start_button_box)
-        self.grpbutt2.setLayout(self.stop_button_box)
+        self.button_grp1.setLayout(self.start_button_box)
+        self.button_grp2.setLayout(self.stop_button_box)
 
         self.button_box = QHBoxLayout()
-        self.button_box.addWidget(self.grpbutt1)
-        self.button_box.addWidget(self.grpbutt2)
+        self.button_box.addWidget(self.button_grp1)
+        self.button_box.addWidget(self.button_grp2)
+
+        #################################
+        #### Forms for Scan Settings ####
+        #################################
 
         x = list(np.linspace(0.001, 0.1, 501))
         y = list(np.linspace(0.001, 0.1, 501))
         start_button.clicked.connect(lambda: self.fsm.scan_xy(x=x, y=y, x_rate=10, y_rate=10))
 
-        #
-        # Create group boxes to hold the values and the plot
-        self.groupbox1 = QGroupBox("Value 1")
-        self.groupbox2 = QGroupBox("Value 2")
+        #########################################################
+        #### Forms for displaying the FSM x and y positions #####
+        #########################################################
+        self.groupbox1 = QGroupBox("FSM x")
+        self.groupbox2 = QGroupBox("FSM y")
 
         self.pos_x = 0
         self.pos_y = 0
@@ -87,52 +93,31 @@ class FSM(GUICore):
         hbox.addWidget(self.groupbox1)
         hbox.addWidget(self.groupbox2)
 
-        # Add the plot to the layout
+        ########################
+        #### Setup the plot ####
+        ########################
         self.plot_widget = pg.PlotWidget()
-
-        grad = QLinearGradient(0, 0, 0, self.plot_widget.height())
-        grad.setColorAt(0, pg.mkColor('#565656'))
-        grad.setColorAt(0.1, pg.mkColor('#525252'))
-        grad.setColorAt(0.5, pg.mkColor('#4e4e4e'))
-        grad.setColorAt(0.9, pg.mkColor('#4a4a4a'))
-        grad.setColorAt(1, pg.mkColor('#464646'))
+        grad = GUICore._gradient_plot_backround(self.plot_widget)
 
         # set the background brush of the plot widget to the gradient
         self.plot_widget.setBackgroundBrush(grad)
 
-        # Create a grid layout to contain the horizontal layout and the plot
+        ########################################
+        #### Create a grid layout container ####
+        ########################################
         grid_layout = QGridLayout()
         grid_layout.addLayout(self.button_box, 0, 0)
-        # grid_layout.addLayout(self.stop_button_box, 0, 1)
         grid_layout.addLayout(hbox, 1, 0)
         grid_layout.addWidget(self.plot_widget, 2, 0)
 
         # Set the layout for the widget
         self.setLayout(grid_layout)
 
-        # Set the window properties
-        self.setWindowTitle("Display Values and Plot")
-        self.setGeometry(100, 100, 400, 300)
-
-        # Create plot
-        # self.plot_widget.setLabel('bottom', 'X Axis Label')
-        # self.plot_widget.setLabel('left', 'Y Axis Label')
-        # self.plot_widget.setXRange(x_waveform[0], x_waveform[-1])
-        # self.plot_widget.setYRange(y_waveform[0], y_waveform[-1])
-        # last_point = self.plot_widget.plot([x_waveform[0]], [y_waveform[0]], pen=None, symbol='o', symbolPen='r')
-
-        # # Update plot
-        # for i in range(len(x_waveform)):
-        #     for j in range(len(y_waveform)):
-        #         last_point.setData(x=[x_waveform[j]], y=[y_waveform[i]])
-        #         pg.QtGui.QGuiApplication.processEvents()
-        #         time.sleep(0.1)
-
-
         # Create a timer to update the value every 10 ms
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_position)
         self.timer.start(10)  # interval is in milliseconds
+        # super().qtimer(self.update_position, 10)
 
         self.show()
 
@@ -144,3 +129,10 @@ class FSM(GUICore):
         # Update the plot
         self.plot_widget.plot([self.pos_x], [self.pos_y], pen=None, symbol='o', symbolPen='r', clear=True)
 
+
+class WorkerThread(QThread):
+    def __init__(self):
+        super().__init__()
+
+    def run(self):
+        pass
