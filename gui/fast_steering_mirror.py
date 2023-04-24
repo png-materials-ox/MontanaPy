@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
     QGroupBox,
     QPushButton
 )
-from PySide6.QtCore import Qt, QTimer, QThread, Signal
+from PySide6.QtCore import Qt, QTimer, QThread, QObject, Signal, Slot
 import pyqtgraph as pg
 
 import hardware.newport_fsm as nfsm
@@ -38,12 +38,13 @@ class ScanThread(QThread):
         # self.plot_updated = Signal(float, float)
 
     def run(self):
-        self.fsm.scan_xy(x=self.x, y=self.y, dwell_ms=self.dwell_ms)
         logging.info('ScanThread run')
+        self.fsm.scan_xy(x=self.x, y=self.y, dwell_ms=self.dwell_ms)
 
-        # self.plot_updated.emit(*self.fsm.get_position())
 
 class PlotFSMThread(QThread):
+    update_plot = Signal(list, list)
+
     def __init__(self, plot_widget, x, y, dwell_ms):
         super().__init__()
         self.plot_widget = plot_widget
@@ -54,14 +55,17 @@ class PlotFSMThread(QThread):
         logging.info('PlotThread called')
 
     def run(self):
-        self.update_fsm_plot()
         logging.info('PlotThread run')
-
-    def update_fsm_plot(self):
         for i in range(len(self.x)):
             for j in range(len(self.y)):
-                self.plot_widget.plot([self.y[j]], [self.x[i]], pen=None, symbol='o', symbolPen='r', clear=True)
-                time.sleep(self.dwell_ms)
+                self.update_plot.emit([self.y[j]], [self.x[i]])
+                self.msleep(self.dwell_ms)
+
+    # def update_fsm_plot(self):
+    #     for i in range(len(self.x)):
+    #         for j in range(len(self.y)):
+    #             self.plot_widget.plot([self.y[j]], [self.x[i]], pen=None, symbol='o', symbolPen='r', clear=True)
+    #             time.sleep(self.dwell_ms)
     # def stop(self):
     #     self.stop_event.set()
 
@@ -112,7 +116,8 @@ class FSM(GUICore):
         y = [i * 0.001 for i in range(101)]
         self.scan_thread = ScanThread(self.fsm, x, y, 100)
         self.plot_thread = PlotFSMThread(self.plot_widget, x, y, 100)
-        start_button.clicked.connect(self.on_start_click)
+        self.plot_thread.update_plot.connect(self.update_plot)
+        start_button.clicked.connect(self._on_start_click)
 
         #########################################################
         #### Forms for displaying the FSM x and y positions #####
@@ -182,6 +187,11 @@ class FSM(GUICore):
         self.pos_x, self.pos_y = self.fsm.get_position()
         self.label1.setText(str(self.pos_x))
         self.label2.setText(str(self.pos_y))
+
+    @Slot(list, list)
+    def update_plot(self, x, y):
+        logging.info('Plotting FSM')
+        self.plot_widget.plot(x, y, pen=None, symbol='o', symbolPen='r', clear=True)
 
     def _on_start_click(self):
         logging.info('FSM start button clicked')
