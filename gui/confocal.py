@@ -1,21 +1,21 @@
 from PySide6.QtWidgets import (
+    QGridLayout,
     QWidget,
     QPushButton,
     QApplication,
+    QHBoxLayout,
     QVBoxLayout,
+    QGroupBox,
     QLabel,
 )
 from PySide6 import QtWidgets
 from PySide6.QtCore import Qt, QTimer
 import pyqtgraph as pg
-import sys
-import numpy as np
 import os
-from random import randint
-import time
-import nidaqmx
 
-class Confocal(QtWidgets.QMainWindow):
+from gui.core import GUICore
+
+class Confocal(GUICore):
     def __init__(self):
         super().__init__()
 
@@ -24,82 +24,96 @@ class Confocal(QtWidgets.QMainWindow):
             style = f.read()
             self.setStyleSheet(style)
 
-        layout = QVBoxLayout()
-
         #TODO Work out how to put this in the css file.
         self.resize(1200, 800)
 
-        # # Add the plot generated after program execution to the layout
-        # self.plot1 = pg.PlotWidget()
-        # self.plot1.plot(np.random.normal(size=100))
-        # layout.addWidget(self.plot1)
+        self.fsm_components = FSMGuiComponents()
 
-        # Add the live data plot to the layout
-        self.graphWidget = pg.PlotWidget()
-        self.graphWidget.setStyleSheet(style)
-        self.setCentralWidget(self.graphWidget)
+        ########################################
+        #### Create a grid layout container ####
+        ########################################
+        grid_layout = QGridLayout()
+        # grid_layout.addLayout(label_box, 0, 0)
+        # grid_layout.addLayout(self.button_box, 1, 0, 1, 2)
+        # grid_layout.addLayout(hbox, 2, 0, 1, 2)
+        # grid_layout.addWidget(self.plot_widget, 3, 0, 2, 2)
 
-        self.x = list(range(100))  # 100 time points
-        self.y = [randint(0, 100) for _ in range(100)]  # 100 data points
+class FSMGuiComponents(GUICore):
+    def __init__(self):
+        super().__init__()
 
-        # self.graphWidget.setBackground('w')
+        ####################################################
+        #### Buttons for starting and stopping FSM scan ####
+        ####################################################
 
-        pen = pg.mkPen(color=(255, 0, 0))
-        # self.data_line = self.graphWidget.plot(self.x, self.y, pen=pen, color='green')
-        self.data_line = pg.ScatterPlotItem(pen=pg.mkPen(width=7, color='green'), symbol='o', size=3)
-        self.graphWidget.addItem(self.data_line)
-        self.timer = QTimer()
-        self.timer.setInterval(50)
-        self.timer.timeout.connect(self.update_plot2)
-        self.timer.start()
+        self.button_grp1 = QGroupBox()
+        self.button_grp2 = QGroupBox()
+        self.button_grp3 = QGroupBox()
 
-        # # Add the plot generated after program execution to the layout
-        # self.plot3 = pg.PlotWidget()
-        # self.plot3.plot(np.random.normal(size=100))
-        # layout.addWidget(self.plot3)
+        self.start_button_box = QVBoxLayout()
+        self.start_button = super()._create_button('Scan', self.start_button_box)
 
-        # Set the layout for the main window
-        self.setLayout(layout)
+        self.stop_button_box = QVBoxLayout()
+        self.stop_button = super()._create_button('Stop', self.stop_button_box)
 
-    def update_plot2(self):
-        # # Update the live data plot with new data
-        # x = np.linspace(0, 10, 100)
-        # y = np.random.rand(100)
-        # self.plot2.plot(x, y)
+        self.zero_button_box = QVBoxLayout()
+        self.zero_button = super()._create_button('Zero FSM', self.zero_button_box)
 
-        while True:
-            try:
-                self.x = self.x[1:]  # Remove the first y element.
-                # self.x.append(self.x[-1] + 1)  # Add a new value 1 higher than the last.
+        self.button_grp1.setLayout(self.start_button_box)
+        self.button_grp2.setLayout(self.stop_button_box)
+        self.button_grp3.setLayout(self.zero_button_box)
 
-                self.y = self.y[1:]  # Remove the first
-                # self.y.append( randint(0,100))  # Add a new random value.
-                time_total = 0
-                with nidaqmx.Task() as task:
-                    task.ci_channels.add_ci_count_edges_chan("Dev1/ctr0")
-                    task.ci_channels[0].ci_count_edges_term = "/Dev1/PFI8"
+        self.button_box = QHBoxLayout()
+        self.button_box.addWidget(self.button_grp1)
+        self.button_box.addWidget(self.button_grp2)
+        self.button_box.addWidget(self.button_grp3)
 
-                    sample_time = 0.01
-                    task.start()
-                    time.sleep(sample_time)
-                    cnt0 = task.read()
-                    time.sleep(sample_time)
+        #########################################################
+        #### Forms for displaying the FSM x and y positions #####
+        #########################################################
+        self.groupbox1 = QGroupBox("FSM x")
+        self.groupbox2 = QGroupBox("FSM y")
 
-                    cnt1 = task.read()
-                    task.stop()
-                    p = (cnt1 - cnt0) * (sample_time) ** -1
+        self.pos_x = 0
+        self.pos_y = 0
 
-                    time_total = self.x[-1] + 1
+        # Create labels to display the values
+        self.label1 = QLabel(str(self.pos_x))
+        self.label2 = QLabel(str(self.pos_y))
 
-                    self.x.append(time_total)
-                    self.y.append(p)
-                    self.data_line.setData(self.x, self.y)  # Update the data.
+        # Set the labels to be centered
+        self.label1.setAlignment(Qt.AlignCenter)
+        self.label2.setAlignment(Qt.AlignCenter)
 
-            except nidaqmx.DaqError as e:
-                print("An error occurred:", e)
+        # Create vertical layouts for the group boxes
+        layout1 = QVBoxLayout()
+        layout2 = QVBoxLayout()
 
-            except Exception as e:
-                print("An unexpected error occurred:", e)
+        # Add the labels to the layouts
+        layout1.addWidget(self.label1)
+        layout2.addWidget(self.label2)
 
-            finally:
-                task.close()
+        # Set the layouts for the group boxes
+        self.groupbox1.setLayout(layout1)
+        self.groupbox2.setLayout(layout2)
+
+        # Create a horizontal layout for the group boxes
+        hbox = QHBoxLayout()
+        hbox.addWidget(self.groupbox1)
+        hbox.addWidget(self.groupbox2)
+
+        # Create the three form inputs and their labels
+        label_ms, input_ms = super()._create_label("Dwell time (ms)", "int", placeholder=str(self.dwell_ms))
+        label_xsteps, input_xsteps = super()._create_label("X steps", "int", placeholder=str(self.xsteps))
+        label_ysteps, input_ysteps = super()._create_label("Y steps", "int", placeholder=str(self.ysteps))
+        label_roi, input_roi = super()._create_label("ROI", "int", placeholder=str(self.roi))
+
+        self.label_box = QHBoxLayout()
+        self.label_box.addWidget(label_ms)
+        self.label_box.addWidget(input_ms)
+        self.label_box.addWidget(label_xsteps)
+        self.label_box.addWidget(input_xsteps)
+        self.label_box.addWidget(label_ysteps)
+        self.label_box.addWidget(input_ysteps)
+        self.label_box.addWidget(label_roi)
+        self.label_box.addWidget(input_roi)

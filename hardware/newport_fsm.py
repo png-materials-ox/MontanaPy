@@ -8,8 +8,8 @@ from hardware.nidaq import DAQ
 class FSM:
 
     def __init__(self):
-        _cfg_file = open(os.path.join(os.getcwd() + "\\config\\config.json"))
-        self.config = json.load(_cfg_file)
+        with open(os.path.join(os.getcwd(), "config", "config.json")) as f:
+            self.config = json.load(f)
 
         self.x_channel = self.config['hardware']['nicard']['fsm_x_volt_chan']
         self.y_channel = self.config['hardware']['nicard']['fsm_y_volt_chan']
