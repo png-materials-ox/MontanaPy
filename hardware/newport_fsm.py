@@ -14,6 +14,12 @@ class FSM:
         self.x_channel = self.config['hardware']['nicard']['fsm_x_volt_chan']
         self.y_channel = self.config['hardware']['nicard']['fsm_y_volt_chan']
 
+        self.x_channel = self.config['hardware']['nicard']['fsm_x_volt_chan']
+        self.y_channel = self.config['hardware']['nicard']['fsm_y_volt_chan']
+
+        self.fsm_x_chan_o = self.config['hardware']['nicard']["scan_x"]
+        self.fsm_y_chan_o = self.config['hardware']['nicard']["scan_y"]
+
         # Parameters required to determine the mirror displacement voltage to image position
         self.mag = self.config["optics"]["mag"]                                     # Magnification of objective
         self.focal_length = self.config["optics"]["focal_length"]                   # mm
@@ -23,12 +29,20 @@ class FSM:
 
         self.daq = DAQ()
 
-    def get_position(self):
+    def get_voltages(self):
         channels = [self.x_channel, self.y_channel]
-        voltages = self.daq.read_analogue_voltage(channels=channels)
+        return self.daq.read_analogue_voltage(channels=channels)
+
+    def get_position(self):
+        voltages = self.get_voltages()
         pos_x = self.voltage_to_position(voltages[0][0], self.um_per_V_x)
         pos_y = self.voltage_to_position(voltages[1][0], self.um_per_V_y)
         return (pos_x, pos_y)
+
+    def zero_fsm(self):
+        self.daq.set_ao_voltage(self.fsm_x_chan_o, 0)
+        self.daq.set_ao_voltage(self.fsm_y_chan_o, 0)
+
 
     def voltage_to_position(self, vin, um_per_V):
         return vin * ((self.focal_length / self.mag) * (um_per_V / self.f_tele))

@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     QPushButton,
 )
 from PySide6 import QtCore
-from PySide6.QtGui import QLinearGradient, QDoubleValidator, QIntValidator
+from PySide6.QtGui import QDoubleValidator, QIntValidator
 import pyqtgraph as pg
 
 import os
@@ -103,13 +103,9 @@ class SPC(QMainWindow):
         self.ave_label.setText(str(self.rolling_ave[-1]))
 
         # Create the three form inputs and their labels
-        label_ms = QLabel("Sample time (ms):")
-        input_ms = QLineEdit()
-        input_ms.setValidator(QDoubleValidator())
-        label_winsize = QLabel("Average Range:")
-        input_winsize = QLineEdit()
-        input_winsize.setValidator(QIntValidator())
-        label3 = QLabel("")
+        label_ms, input_ms = GUICore._create_label("Dwell time (ms)", "int")
+        label_winsize, input_winsize = GUICore._create_label("Average Range", "int")
+        label_3, input_3 = GUICore._create_label("", "int")
 
         layout.addWidget(start_btn, 0, 0)
         layout.addWidget(stop_btn, 0, 1)
@@ -119,7 +115,7 @@ class SPC(QMainWindow):
         layout.addWidget(input_ms, 1, 1)
         layout.addWidget(label_winsize, 1, 2)
         layout.addWidget(input_winsize, 1, 3)
-        layout.addWidget(label3, 1, 5)
+        layout.addWidget(label_3, 1, 5)
 
         layout.addWidget(self.graphWidget, 2, 0, 2, 6)
 

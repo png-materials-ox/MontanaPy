@@ -8,7 +8,6 @@ import time
 import json
 import os
 import contextlib
-import numpy as np
 
 
 class DAQ:
@@ -145,6 +144,20 @@ class DAQ:
                         auto_start=False
                     )
                     time.sleep(dwell_ms/1000)
+
+            task.stop()
+            task.wait_until_done(timeout=nidaqmx.constants.WAIT_INFINITELY)
+
+    def set_ao_voltage(self, channel, voltage):
+        """
+        """
+        with self._open_task() as task:
+            task.ao_channels.add_ao_voltage_chan(channel)
+            task.ao_channels.all.ao_max = 10 #TODO put in config file
+            task.ao_channels.all.ao_min = -10
+
+            task.start()
+            task.write([voltage],auto_start=False)
 
             task.stop()
             task.wait_until_done(timeout=nidaqmx.constants.WAIT_INFINITELY)

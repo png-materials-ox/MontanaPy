@@ -1,84 +1,20 @@
 from PySide6.QtWidgets import (
-    QApplication,
     QGridLayout,
-    QWidget,
     QLabel,
     QVBoxLayout,
     QHBoxLayout,
     QGroupBox,
-    QPushButton,
-    QLineEdit
 )
 from PySide6.QtCore import Qt, QTimer, QThread, QObject, Signal, Slot
-from PySide6.QtGui import QDoubleValidator, QIntValidator
 import pyqtgraph as pg
 
 import hardware.newport_fsm as nfsm
 from gui.core import GUICore
 
-import time
-
 import logging
 
 logging.basicConfig(filename='log/log.log', level=logging.DEBUG,
                             format='%(asctime)s %(levelname)s:%(message)s')
-
-import numpy as np
-
-class ScanThread(QThread):
-    def __init__(self, fsm, x, y, dwell_ms):
-        super().__init__()
-
-        logging.info('ScanThread called')
-
-        self.stop_flag = False
-        self.fsm = fsm
-        self.x = x
-        self.y = y
-        self.dwell_ms = dwell_ms
-
-        self.stop_flag = False
-
-        # self.plot_updated = Signal(float, float)
-
-    def run(self):
-        logging.info('ScanThread run')
-        while not self.stop_flag:
-            self.fsm.scan_xy(x=self.x, y=self.y, dwell_ms=self.dwell_ms)
-        logging.info('ScanThread stopped')
-        return
-
-class PlotFSMThread(QThread):
-    update_plot = Signal(list, list)
-
-    def __init__(self, plot_widget, x, y, dwell_ms):
-        super().__init__()
-        self.plot_widget = plot_widget
-        self.x = x
-        self.y = y
-        self.dwell_ms = dwell_ms
-        self.stop_flag = False
-
-        logging.info('PlotThread called')
-
-    def run(self):
-        logging.info('PlotThread run')
-        for i in range(len(self.x)):
-            for j in range(len(self.y)):
-                if self.stop_flag:
-                    logging.info('PlotThread stopped')
-                    return
-                self.update_plot.emit([self.y[j]], [self.x[i]])
-                self.msleep(self.dwell_ms)
-
-    # def update_fsm_plot(self):
-    #     for i in range(len(self.x)):
-    #         for j in range(len(self.y)):
-    #             self.plot_widget.plot([self.y[j]], [self.x[i]], pen=None, symbol='o', symbolPen='r', clear=True)
-    #             time.sleep(self.dwell_ms)
-    # def stop(self):
-    #     self.stop_event.set()
-
 
 class FSM(GUICore):
     def __init__(self):
@@ -91,7 +27,7 @@ class FSM(GUICore):
 
         # Set the window properties
         self.setWindowTitle("Display Values and Plot")
-        self.setGeometry(100, 100, 400, 300)
+        self.setGeometry(200, 200, 800, 600)
 
 
         x = [i * 0.001 for i in range(101)]
@@ -117,6 +53,7 @@ class FSM(GUICore):
 
         self.button_grp1 = QGroupBox()
         self.button_grp2 = QGroupBox()
+        self.button_grp3 = QGroupBox()
 
         self.start_button_box = QVBoxLayout()
         start_button = super()._create_button('Scan', self.start_button_box)
@@ -124,12 +61,17 @@ class FSM(GUICore):
         self.stop_button_box = QVBoxLayout()
         stop_button = super()._create_button('Stop', self.stop_button_box)
 
+        self.zero_button_box = QVBoxLayout()
+        zero_button = super()._create_button('Zero FSM', self.zero_button_box)
+
         self.button_grp1.setLayout(self.start_button_box)
         self.button_grp2.setLayout(self.stop_button_box)
+        self.button_grp3.setLayout(self.zero_button_box)
 
         self.button_box = QHBoxLayout()
         self.button_box.addWidget(self.button_grp1)
         self.button_box.addWidget(self.button_grp2)
+        self.button_box.addWidget(self.button_grp3)
 
         #################################
         #### Forms for Scan Settings ####
@@ -140,6 +82,7 @@ class FSM(GUICore):
         self.plot_thread.update_plot.connect(self.update_plot)
         start_button.clicked.connect(self._on_start_click)
         stop_button.clicked.connect(self._on_stop_click)
+        zero_button.clicked.connect(self.fsm.zero_fsm)
 
         #########################################################
         #### Forms for displaying the FSM x and y positions #####
@@ -195,15 +138,6 @@ class FSM(GUICore):
         #### Create a grid layout container ####
         ########################################
         grid_layout = QGridLayout()
-
-        # grid_layout.addWidget(label_ms, 0, 0)
-        # grid_layout.addWidget(input_ms, 0, 1)
-        # grid_layout.addWidget(label_xsteps, 1, 0)
-        # grid_layout.addWidget(input_xsteps, 1, 1)
-        # grid_layout.addWidget(label_ysteps, 1, 2)
-        # grid_layout.addWidget(input_ysteps, 1, 3)
-        # grid_layout.addWidget(label_roi, 1, 4)
-        # grid_layout.addWidget(input_roi, 1, 5)
         grid_layout.addLayout(label_box, 0, 0)
         grid_layout.addLayout(self.button_box, 1, 0, 1, 2)
         grid_layout.addLayout(hbox, 2, 0, 1, 2)
@@ -221,26 +155,26 @@ class FSM(GUICore):
         self.show()
 
         # Connect a signal to input1 to store its text as a variable
-        input_ms.returnPressed.connect(lambda: self._store_dwell_time(input_ms.text(10)))
-        input_xsteps.returnPressed.connect(lambda: self._store_xsteps(input_xsteps.text(250)))
-        input_ysteps.returnPressed.connect(lambda: self._store_ysteps(input_ysteps.text(250)))
-        input_roi.returnPressed.connect(lambda: self._store_roi(input_roi.text(60)))
+        input_ms.returnPressed.connect(lambda: self._store_dwell_time(input_ms.text()))
+        input_xsteps.returnPressed.connect(lambda: self._store_xsteps(input_xsteps.text()))
+        input_ysteps.returnPressed.connect(lambda: self._store_ysteps(input_ysteps.text()))
+        input_roi.returnPressed.connect(lambda: self._store_roi(input_roi.text()))
 
-    @staticmethod
     def _store_dwell_time(self, text):
-        self.dwell_time = float(text) / 1000
+        self.dwell_time = int(text) / 1000
+        logging.info("Dwell time set to {:f} ms".format(self.dwell_time*1000))
 
-    @staticmethod
     def _store_xsteps(self, text):
-        self.xsteps = float(text)
+        self.xsteps = int(text)
+        logging.info("X steps time set to {:f}".format(self.xsteps))
 
-    @staticmethod
     def _store_ysteps(self, text):
         self.ysteps = float(text)
+        logging.info("Y steps time set to {:f}".format(self.ysteps))
 
-    @staticmethod
     def _store_roi(self, text):
-        self.ysteps = float(text)
+        self.roi = float(text)
+        logging.info("ROI set to {:f}".format(self.roi))
 
     def update_position(self):
         self.pos_x, self.pos_y = self.fsm.get_position()
@@ -261,3 +195,51 @@ class FSM(GUICore):
         # self.scan_thread.stop_flag = True
         # self.scan_thread.terminate()
         self.plot_thread.stop_flag = True
+
+
+class ScanThread(QThread):
+    def __init__(self, fsm, x, y, dwell_ms):
+        super().__init__()
+
+        logging.info('ScanThread called')
+
+        self.stop_flag = False
+        self.fsm = fsm
+        self.x = x
+        self.y = y
+        self.dwell_ms = dwell_ms
+
+        self.stop_flag = False
+
+        # self.plot_updated = Signal(float, float)
+
+    def run(self):
+        logging.info('ScanThread run')
+        while not self.stop_flag:
+            self.fsm.scan_xy(x=self.x, y=self.y, dwell_ms=self.dwell_ms)
+        logging.info('ScanThread stopped')
+        return
+
+
+class PlotFSMThread(QThread):
+    update_plot = Signal(list, list)
+
+    def __init__(self, plot_widget, x, y, dwell_ms):
+        super().__init__()
+        self.plot_widget = plot_widget
+        self.x = x
+        self.y = y
+        self.dwell_ms = dwell_ms
+        self.stop_flag = False
+
+        logging.info('PlotThread called')
+
+    def run(self):
+        logging.info('PlotThread run')
+        for i in range(len(self.x)):
+            for j in range(len(self.y)):
+                if self.stop_flag:
+                    logging.info('PlotThread stopped')
+                    return
+                self.update_plot.emit([self.y[j]], [self.x[i]])
+                self.msleep(self.dwell_ms)
