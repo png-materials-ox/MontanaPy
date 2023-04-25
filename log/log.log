@@ -1395,3 +1395,7 @@
 2023-04-25 18:12:38,947 INFO:FSM stop button clicked
 2023-04-25 18:12:38,952 INFO:PlotThread stopped
 2023-04-25 18:12:38,955 INFO:ScanThread stopped
+2023-04-25 18:30:47,473 INFO:ScanThread called
+2023-04-25 18:30:47,474 INFO:PlotThread called
+2023-04-25 18:30:47,492 INFO:FSM Window Opened
+2023-04-25 18:34:40,040 INFO:SPC Window Opened

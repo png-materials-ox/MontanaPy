@@ -1,5 +1,5 @@
 import sys
-from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QTabWidget, QPushButton
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QTabWidget, QPushButton
 from gui.core import GUICore
 from gui.aom import AOM
 from gui.eom import EOM
@@ -12,6 +12,8 @@ import logging
 import warnings
 warnings.filterwarnings("ignore")
 
+import ctypes
+import sys
 
 class MontanaPy(GUICore):
     """

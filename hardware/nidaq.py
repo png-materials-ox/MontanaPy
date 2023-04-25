@@ -1,14 +1,10 @@
 import nidaqmx
-from nidaqmx.constants import (
-    Edge,
-    AcquisitionType,
-    Signal,
-    VoltageUnits)
+from nidaqmx.constants import Edge
 import time
-import json
 import os
 from contextlib import contextmanager
 from core import Core
+
 
 class DAQ:
     def __init__(self):
@@ -78,11 +74,12 @@ class DAQ:
 
             :return: None
             """
+        assert isinstance(dwell_ms, (int, float)), "Sample time must be numeric"
         with self.ctx._open_task() as task:
             task.ao_channels.add_ao_voltage_chan(self.fsm_x_chan_o)
             task.ao_channels.add_ao_voltage_chan(self.fsm_y_chan_o)
-            task.ao_channels.all.ao_max = 10 #TODO put in config file
-            task.ao_channels.all.ao_min = -10
+            task.ao_channels.all.ao_max = self.daq["ao_max"]
+            task.ao_channels.all.ao_min = self.daq["ao_min"]
 
             task.start()
 
@@ -98,8 +95,8 @@ class DAQ:
         """
         with self.ctx._open_task() as task:
             task.ao_channels.add_ao_voltage_chan(channel)
-            task.ao_channels.all.ao_max = 10 #TODO put in config file
-            task.ao_channels.all.ao_min = -10
+            task.ao_channels.all.ao_max = self.daq["ao_max"]
+            task.ao_channels.all.ao_min = self.daq["ao_min"]
 
             task.start()
 

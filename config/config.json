@@ -50,6 +50,8 @@
             "x_range": [0, 20e-6],
             "y_range": [0, 20e-6],
             "z_range": [0, 20e-6],
+            "ao_min": -10,
+            "ao_max": 10,
             "scanner_voltage_ranges": [
                 [0, 10],
                 [0, 10],
