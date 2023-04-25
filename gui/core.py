@@ -18,6 +18,11 @@ from core import Core
 
 class GUICore(QWidget):
     def __init__(self, parent=None):
+        '''
+        Initializes the GUICore class.
+
+        :param parent: (QWidget) The parent widget. Defaults to None.
+        '''
         super().__init__(parent)
 
         conf_path = os.path.join(os.getcwd() + "\\config\\config.json")
@@ -31,6 +36,13 @@ class GUICore(QWidget):
 
     @staticmethod
     def _create_button(name, layout):
+        '''
+        Creates a QPushButton with the given name and adds it to the layout if one is provided.
+
+        :param name: (str) The name of the button.
+        :param layout: (QLayout) The layout to add the button to.
+        :return: (QPushButton) The newly created button.
+        '''
         button = QPushButton(name)
         button.setObjectName(name)
         if layout:
@@ -39,6 +51,17 @@ class GUICore(QWidget):
 
     @staticmethod
     def _create_label(name, validator, placeholder="Enter your text here"):
+        '''
+        Creates a QLabel and a QLineEdit with the given name and validator, and sets the
+        placeholder text.
+
+        :param name: (str) The name of the label.
+        :param validator: (str) The type of validator to use for the QLineEdit. Should be either '
+                           int' or 'double'.
+        :param placeholder: (str) The text to display as a placeholder in the QLineEdit.
+                            Defaults to "Enter your text here".
+        :return: (tuple) A tuple containing the QLabel and QLineEdit objects.
+        '''
         label = QLabel(name)
         input = QLineEdit()
         input.setPlaceholderText(placeholder)
@@ -50,6 +73,12 @@ class GUICore(QWidget):
 
     @staticmethod
     def _gradient_plot_backround(plot_widget):
+        '''
+        Creates a QLinearGradient to use as a background for a Pyqtgraph plot widget.
+
+        :param plot_widget: (Pyqtgraph PlotWidget) The plot widget to set the background for.
+        :return: (QLinearGradient) The newly created gradient object.
+        '''
         grad = QLinearGradient(0, 0, 0, plot_widget.height())
         grad.setColorAt(0, pg.mkColor('#565656'))
         grad.setColorAt(0.1, pg.mkColor('#525252'))
@@ -60,6 +89,12 @@ class GUICore(QWidget):
 
     @staticmethod
     def _open_window(self, obj, title):
+        '''
+        Opens a new window with the given title.
+
+        :param obj: (QWidget) The widget to use as the window.
+        :param title: (str) The title to set for the window.
+        '''
         self.window = obj
         self.window.setWindowTitle(title)
         self.window.show()
@@ -68,6 +103,12 @@ class GUICore(QWidget):
 
     @contextmanager
     def qtimer(self, func, interval):
+        '''
+
+        :param func:
+        :param interval:
+        :return:
+        '''
         try:
             timer = QTimer()
             timer.timeout.connect(func)
