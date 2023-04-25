@@ -3,7 +3,7 @@ import os
 import time
 import json
 from hardware.nidaq import DAQ
-
+from core import Core
 
 class FSM:
 

@@ -10,13 +10,20 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QLinearGradient, QDoubleValidator, QIntValidator
 from PySide6.QtCore import Qt, QTimer
 import pyqtgraph as pg
-from contextlib import contextmanager
 
+import os
+from contextlib import contextmanager
 import logging
 
 class GUICore(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+
+        # conf_path = os.path.join(os.getcwd() + "\\config\\config.json")
+        #
+        # with self._open_config(conf_path) as config:
+        #     self.daq = config["hardware"]["nicard"]  # Daq device ID
+
         logging.basicConfig(filename='log/log.log', level=logging.DEBUG,
                             format='%(asctime)s %(levelname)s:%(message)s')
         self.logging = logging.getLogger("log/log.log")

@@ -1340,3 +1340,13 @@
 2023-04-25 17:02:00,867 INFO:FSM start button clicked
 2023-04-25 17:02:00,869 INFO:ScanThread run
 2023-04-25 17:02:00,869 INFO:PlotThread run
+2023-04-25 17:14:51,577 INFO:ScanThread called
+2023-04-25 17:39:06,345 INFO:ScanThread called
+2023-04-25 17:39:06,345 INFO:PlotThread called
+2023-04-25 17:39:06,377 INFO:FSM Window Opened
+2023-04-25 17:39:16,913 INFO:FSM start button clicked
+2023-04-25 17:39:16,915 INFO:ScanThread run
+2023-04-25 17:39:16,915 INFO:PlotThread run
+2023-04-25 17:39:20,866 INFO:FSM stop button clicked
+2023-04-25 17:39:20,870 INFO:PlotThread stopped
+2023-04-25 17:39:20,874 INFO:ScanThread stopped

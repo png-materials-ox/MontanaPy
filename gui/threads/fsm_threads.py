@@ -1,8 +1,5 @@
 from PySide6.QtCore import QThread, Signal
-import logging
-
-logging.basicConfig(filename='log/log.log', level=logging.DEBUG,
-                            format='%(asctime)s %(levelname)s:%(message)s')
+from gui.core import GUICore
 
 
 class ScanThread(QThread):
@@ -12,7 +9,8 @@ class ScanThread(QThread):
     def __init__(self, fsm, x, y, dwell_ms):
         super().__init__()
 
-        logging.info('ScanThread called')
+        self.logging = GUICore().logging
+        self.logging.info('ScanThread called')
 
         self.stop_flag = False
         self.fsm = fsm
@@ -23,11 +21,11 @@ class ScanThread(QThread):
         self.stop_flag = False
 
     def run(self):
-        logging.info('ScanThread run')
+        self.logging.info('ScanThread run')
         for i in range(len(self.x)):
             for j in range(len(self.y)):
                 if self.stop_flag:
-                    logging.info('ScanThread stopped')
+                    self.logging.info('ScanThread stopped')
                     return
                 self.fsm.scan_xy(x=self.x[i], y=self.y[j], dwell_ms=self.dwell_ms)
 
@@ -50,24 +48,25 @@ class PlotFSMThread(QThread):
         :param dwell_ms: Dwell time of the FSM
         '''
         super().__init__()
+        self.logging = GUICore().logging
         self.plot_widget = plot_widget
         self.x = x
         self.y = y
         self.dwell_ms = dwell_ms
         self.stop_flag = False
 
-        logging.info('PlotThread called')
+        self.logging.info('PlotThread called')
 
     def run(self):
         '''
         Runs the PlotFSM thread upon execution
         :return:
         '''
-        logging.info('PlotThread run')
+        self.logging.info('PlotThread run')
         for i in range(len(self.x)):
             for j in range(len(self.y)):
                 if self.stop_flag:
-                    logging.info('PlotThread stopped')
+                    self.logging.info('PlotThread stopped')
                     return
                 else:
                     # Update the x and y positions on the plot. Attaches the signals to the update_plot variable

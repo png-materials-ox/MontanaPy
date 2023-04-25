@@ -8,13 +8,13 @@ import time
 import json
 import os
 import contextlib
-
+from core import Core
 
 class DAQ:
     def __init__(self):
         conf_path = os.path.join(os.getcwd() + "\\config\\config.json")
 
-        with self._open_config(conf_path) as config:
+        with Core()._open_config(conf_path) as config:
             self.daq = config["hardware"]["nicard"]        # Daq device ID
 
         self.ctr_chan = self.daq["counter_channels"][0]     # DAQ channel for single photon counting

@@ -7,12 +7,12 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QTimer, Slot
 import pyqtgraph as pg
+import numpy as np
 
 import hardware.newport_fsm as nfsm
 from gui.core import GUICore
 from gui.threads.fsm_threads import ScanThread, PlotFSMThread
 
-import numpy as np
 
 class FSM(GUICore):
     def __init__(self):
@@ -27,6 +27,7 @@ class FSM(GUICore):
         self.setWindowTitle("Display Values and Plot")
         self.setGeometry(200, 200, 800, 600)
 
+        # TODO: Need to work out how to properly get these from the input forms
         self.dwell_ms = 10
         self.xsteps = 100
         self.ysteps = 100
@@ -46,10 +47,10 @@ class FSM(GUICore):
         ########################
         self.plot_widget = pg.PlotWidget()
 
-        self.plot_widget.setXRange(min(self.x), max(self.x), padding=0)
-        self.plot_widget.setYRange(min(self.y), max(self.y), padding=0)
-        grad = GUICore._gradient_plot_backround(self.plot_widget)
-        self.plot_widget.setBackgroundBrush(grad) # set the background brush of the plot widget to the gradient
+        self.plot_widget.setXRange(min(self.x), max(self.x))
+        self.plot_widget.setYRange(min(self.y), max(self.y))
+        grad = super()._gradient_plot_backround(self.plot_widget)
+        self.plot_widget.setBackgroundBrush(grad)  # set the background brush of the plot widget to the gradient
 
         # ####################################################
         # #### Buttons for starting and stopping FSM scan ####

@@ -132,5 +132,8 @@
         "mag": 100,
         "focal_length": 160,
         "f_tele": 400
+    },
+    "debug" : {
+        "logfile" : "log/log.log"
     }
 }
