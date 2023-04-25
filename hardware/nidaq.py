@@ -23,24 +23,7 @@ class DAQ:
         self.fsm_x_chan_o = self.daq["scan_x"]
         self.fsm_y_chan_o = self.daq["scan_y"]
 
-    @contextmanager
-    def _open_task(self):
-        """
-            A context manager that creates a new nidaqmx.Task object and yields it, and then
-            closes the Task object after the block of code in the with statement completes. If an
-            exception occurs inside the with block, the exception is caught and printed before the
-            Task object is closed.
-
-            :return: A new nidaqmx.Task object.
-            :rtype: nidaqmx.Task
-            """
-        try:
-            task = nidaqmx.Task()
-            yield task
-        except nidaqmx.errors.DaqError() as e:
-            print(e)
-        finally:
-            task.close()
+        self.ctx = NIDaqMxContext()
 
     def counter(self, sample_time):
         '''
@@ -51,35 +34,24 @@ class DAQ:
         assert isinstance(self.ctr_chan, str), "Counter channel variable must be of type Str"
         assert isinstance(self.photon_term, str), "Photon channel variable must be of type Str"
         assert isinstance(sample_time, (int, float)), "Sample time must be numeric"
-        try:
-            with nidaqmx.Task() as task:
-                task.ci_channels.add_ci_count_edges_chan(self.ctr_chan)
-                task.ci_channels[0].ci_count_edges_term = self.photon_term
 
-                task.start()
-                time.sleep(sample_time)
-                try:
-                    cnt0 = task.read()
-                except nidaqmx.errors.DaqReadError() as e:
-                    print(e)
-                time.sleep(sample_time)
+        with self.ctx._open_task() as task:
+            task.ci_channels.add_ci_count_edges_chan(self.ctr_chan)
+            task.ci_channels[0].ci_count_edges_term = self.photon_term
 
-                try:
-                    cnt1 = task.read()
-                except nidaqmx.errors.DaqReadError() as e:
-                    print(e)
+            task.start()
+            time.sleep(sample_time)
+            with self.ctx._read_task(task) as c:
+                cnt0 = c
 
-                task.stop()
-                phot_cnt = (cnt1 - cnt0) * (sample_time) ** -1
-                return phot_cnt
-        except nidaqmx.DaqError as e:\
-            print("An error occurred:", e)
+            time.sleep(sample_time)
 
-        except Exception as e:
-            print("An unexpected error occurred:", e)
+            with self.ctx._read_task(task) as c:
+                cnt1 = c
 
-        finally:
-            task.close()
+            task.stop()
+            phot_cnt = (cnt1 - cnt0) * (sample_time) ** -1
+            return phot_cnt
 
     def scan_voltage(self):
         pass
@@ -106,14 +78,16 @@ class DAQ:
 
             :return: None
             """
-        with self._open_task() as task:
+        with self.ctx._open_task() as task:
             task.ao_channels.add_ao_voltage_chan(self.fsm_x_chan_o)
             task.ao_channels.add_ao_voltage_chan(self.fsm_y_chan_o)
             task.ao_channels.all.ao_max = 10 #TODO put in config file
             task.ao_channels.all.ao_min = -10
 
             task.start()
-            task.write([x, y], auto_start=False)
+
+            with self.ctx._write_task(task, [x,y]) as c:
+                wrt = c
             time.sleep(dwell_ms/1000)
 
             task.stop()
@@ -122,13 +96,15 @@ class DAQ:
     def set_ao_voltage(self, channel, voltage):
         """
         """
-        with self._open_task() as task:
+        with self.ctx._open_task() as task:
             task.ao_channels.add_ao_voltage_chan(channel)
             task.ao_channels.all.ao_max = 10 #TODO put in config file
             task.ao_channels.all.ao_min = -10
 
             task.start()
-            task.write([voltage],auto_start=False)
+
+            with self.ctx._write_task(task, [voltage]) as c:
+                wr = c
 
             task.stop()
             task.wait_until_done(timeout=nidaqmx.constants.WAIT_INFINITELY)
@@ -201,8 +177,8 @@ class NIDaqMxContext:
             :rtype:
             """
         try:
-            read = task.write(val)
-            yield read
+            write = task.write(val)
+            yield write
         except nidaqmx.errors.DaqWriteError() as e:
             print(e)
         finally:
