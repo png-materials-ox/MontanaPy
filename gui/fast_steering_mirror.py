@@ -4,12 +4,16 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QGroupBox,
+    QApplication
 )
+import sys
 from PySide6.QtCore import Qt, QTimer, QThread, QObject, Signal, Slot
 import pyqtgraph as pg
 
 import hardware.newport_fsm as nfsm
 from gui.core import GUICore
+
+import numpy as np
 
 import logging
 
@@ -29,18 +33,27 @@ class FSM(GUICore):
         self.setWindowTitle("Display Values and Plot")
         self.setGeometry(200, 200, 800, 600)
 
+        # self.x = [i * 0.001 for i in range(101)]
+        # self.y = [i * 0.001 for i in range(101)]
+        self.dwell_ms = 10
+        self.xsteps = 100
+        self.ysteps = 100
+        self.roi = 60
 
-        x = [i * 0.001 for i in range(101)]
-        y = [i * 0.001 for i in range(101)]
-        dwell_ms = 10
+        self.fsm = nfsm.FSM()
+        sr = self.fsm.calc_scan_voltage_range(roi=self.roi)
+
+        self.x = list(np.linspace(sr['x_min'], sr['x_max'], self.xsteps))
+        print(self.x)
+        self.y = list(np.linspace(sr['y_min'], sr['y_max'], self.xsteps))
 
         ########################
         #### Setup the plot ####
         ########################
         self.plot_widget = pg.PlotWidget()
 
-        self.plot_widget.setXRange(min(x), max(x), padding=0)
-        self.plot_widget.setYRange(min(y), max(y), padding=0)
+        self.plot_widget.setXRange(min(self.x), max(self.x), padding=0)
+        self.plot_widget.setYRange(min(self.y), max(self.y), padding=0)
         grad = GUICore._gradient_plot_backround(self.plot_widget)
 
         # set the background brush of the plot widget to the gradient
@@ -49,7 +62,6 @@ class FSM(GUICore):
         ####################################################
         #### Buttons for starting and stopping FSM scan ####
         ####################################################
-        self.fsm = nfsm.FSM()
 
         self.button_grp1 = QGroupBox()
         self.button_grp2 = QGroupBox()
@@ -77,8 +89,8 @@ class FSM(GUICore):
         #### Forms for Scan Settings ####
         #################################
 
-        self.scan_thread = ScanThread(self.fsm, x, y, dwell_ms)
-        self.plot_thread = PlotFSMThread(self.plot_widget, x, y, dwell_ms)
+        self.scan_thread = ScanThread(self.fsm, self.x, self.y, self.dwell_ms)
+        self.plot_thread = PlotFSMThread(self.plot_widget, self.x, self.y, self.dwell_ms)
         self.plot_thread.update_plot.connect(self.update_plot)
         start_button.clicked.connect(self._on_start_click)
         stop_button.clicked.connect(self._on_stop_click)
@@ -119,10 +131,10 @@ class FSM(GUICore):
         hbox.addWidget(self.groupbox2)
 
         # Create the three form inputs and their labels
-        label_ms, input_ms = super()._create_label("Dwell time (ms)", "int")
-        label_xsteps, input_xsteps = super()._create_label("X steps", "int")
-        label_ysteps, input_ysteps = super()._create_label("Y steps", "int")
-        label_roi, input_roi = super()._create_label("ROI", "int")
+        label_ms, input_ms = super()._create_label("Dwell time (ms)", "int", placeholder=str(self.dwell_ms))
+        label_xsteps, input_xsteps = super()._create_label("X steps", "int", placeholder=str(self.xsteps))
+        label_ysteps, input_ysteps = super()._create_label("Y steps", "int", placeholder=str(self.ysteps))
+        label_roi, input_roi = super()._create_label("ROI", "int", placeholder=str(self.roi))
 
         label_box = QHBoxLayout()
         label_box.addWidget(label_ms)
@@ -192,7 +204,7 @@ class FSM(GUICore):
 
     def _on_stop_click(self):
         logging.info('FSM stop button clicked')
-        # self.scan_thread.stop_flag = True
+        self.scan_thread.stop_flag = True
         # self.scan_thread.terminate()
         self.plot_thread.stop_flag = True
 
@@ -219,6 +231,12 @@ class ScanThread(QThread):
             self.fsm.scan_xy(x=self.x, y=self.y, dwell_ms=self.dwell_ms)
         logging.info('ScanThread stopped')
         return
+        # for i in range(len(self.x)):
+        #     for j in range(len(self.y)):
+        #         if self.stop_flag:
+        #             logging.info('ScanThread stopped')
+        #             return
+        #         self.fsm.scan_xy(x=self.x[i], y=self.y[j], dwell_ms=self.dwell_ms)
 
 
 class PlotFSMThread(QThread):
@@ -243,3 +261,9 @@ class PlotFSMThread(QThread):
                     return
                 self.update_plot.emit([self.y[j]], [self.x[i]])
                 self.msleep(self.dwell_ms)
+
+# if __name__ == '__main__':
+#     app = QApplication(sys.argv)
+#     qt = FSM()
+#     qt.show()
+#     sys.exit(app.exec())

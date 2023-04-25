@@ -28,9 +28,10 @@ class GUICore(QWidget):
         return button
 
     @staticmethod
-    def _create_label(name, validator):
+    def _create_label(name, validator, placeholder="Enter your text here"):
         label = QLabel(name)
         input = QLineEdit()
+        input.setPlaceholderText(placeholder)
         if validator == 'int':
             input.setValidator(QIntValidator())
         elif validator == 'double':

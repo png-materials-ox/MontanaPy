@@ -47,5 +47,19 @@ class FSM:
     def voltage_to_position(self, vin, um_per_V):
         return vin * ((self.focal_length / self.mag) * (um_per_V / self.f_tele))
 
+    def position_to_voltage(self, position, um_per_V):
+        return position / ((self.focal_length / self.mag) * (um_per_V / self.f_tele))
+
     def scan_xy(self, x=[], y=[], dwell_ms=10):
         self.daq.scan_xy(x_waveform=x, y_waveform=y, dwell_ms=dwell_ms)
+
+    def calc_scan_voltage_range(self, roi=50):
+        # If the ROI is not selected, zero the FSM
+        self.zero_fsm()
+
+        x_min = self.position_to_voltage(-.5*roi*1e-03, self.um_per_V_x)
+        x_max = self.position_to_voltage(.5 * roi * 1e-03, self.um_per_V_x)
+        y_min = self.position_to_voltage(-.5 * roi * 1e-03, self.um_per_V_y)
+        y_max = self.position_to_voltage(.5 * roi * 1e-03, self.um_per_V_y)
+
+        return {"x_min": x_min, "x_max": x_max, "y_min": y_min, "y_max": y_max}
