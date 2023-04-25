@@ -1321,3 +1321,16 @@
 2023-04-25 16:40:06,287 INFO:FSM stop button clicked
 2023-04-25 16:40:06,291 INFO:ScanThread stopped
 2023-04-25 16:40:06,294 INFO:PlotThread stopped
+2023-04-25 16:42:06,400 INFO:ScanThread called
+2023-04-25 16:42:06,401 INFO:PlotThread called
+2023-04-25 16:43:52,583 INFO:ScanThread called
+2023-04-25 16:43:52,583 INFO:PlotThread called
+2023-04-25 16:43:52,602 INFO:FSM Window Opened
+2023-04-25 16:43:56,717 INFO:X steps time set to 100.000000
+2023-04-25 16:43:58,403 INFO:FSM start button clicked
+2023-04-25 16:43:58,405 INFO:ScanThread run
+2023-04-25 16:43:58,406 INFO:PlotThread run
+2023-04-25 16:44:00,818 INFO:FSM start button clicked
+2023-04-25 16:44:01,559 INFO:FSM stop button clicked
+2023-04-25 16:44:01,563 INFO:ScanThread stopped
+2023-04-25 16:44:01,570 INFO:PlotThread stopped

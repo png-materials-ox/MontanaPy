@@ -37,10 +37,12 @@ class FSM(GUICore):
         self.ysteps = 100
         self.roi = 60
 
+        # Call a subclass which contains layout components for the FSM page
         self.fsm_components = FSMGuiComponents(self.xsteps, self.ysteps, self.roi, self.dwell_ms)
-        self.fsm = nfsm.FSM()
-        sr = self.fsm.calc_scan_voltage_range(roi=self.roi)
+        self.fsm = nfsm.FSM() # FSM hardware class
 
+        # Calculate scan range
+        sr = self.fsm.calc_scan_voltage_range(roi=self.roi)
         self.x = list(np.linspace(sr['x_min'], sr['x_max'], self.xsteps))
         self.y = list(np.linspace(sr['y_min'], sr['y_max'], self.xsteps))
 
@@ -52,9 +54,7 @@ class FSM(GUICore):
         self.plot_widget.setXRange(min(self.x), max(self.x), padding=0)
         self.plot_widget.setYRange(min(self.y), max(self.y), padding=0)
         grad = GUICore._gradient_plot_backround(self.plot_widget)
-
-        # set the background brush of the plot widget to the gradient
-        self.plot_widget.setBackgroundBrush(grad)
+        self.plot_widget.setBackgroundBrush(grad) # set the background brush of the plot widget to the gradient
 
         # ####################################################
         # #### Buttons for starting and stopping FSM scan ####
@@ -64,9 +64,10 @@ class FSM(GUICore):
         self.zero_button = self.fsm_components.zero_button
         self.button_box = self.fsm_components.button_box
 
+        # Need to run the processes on different threads to prevent blocking
         self.scan_thread = ScanThread(self.fsm, self.x, self.y, self.dwell_ms)
         self.plot_thread = PlotFSMThread(self.plot_widget, self.x, self.y, self.dwell_ms)
-        self.plot_thread.update_plot.connect(self.update_plot)
+        self.plot_thread.update_plot.connect(self.update_plot) # Connect method to signal from thread
         self.start_button.clicked.connect(self._on_start_click)
         self.stop_button.clicked.connect(self._on_stop_click)
         self.zero_button.clicked.connect(self.fsm.zero_fsm)
@@ -77,46 +78,29 @@ class FSM(GUICore):
         self.label1 = self.fsm_components.label1
         self.label2 = self.fsm_components.label2
         self.hbox = self.fsm_components.hbox
+        self.label_box = self.fsm_components.label_box
 
-        # Create the three form inputs and their labels
-        label_ms, input_ms = super()._create_label("Dwell time (ms)", "int", placeholder=str(self.dwell_ms))
-        label_xsteps, input_xsteps = super()._create_label("X steps", "int", placeholder=str(self.xsteps))
-        label_ysteps, input_ysteps = super()._create_label("Y steps", "int", placeholder=str(self.ysteps))
-        label_roi, input_roi = super()._create_label("ROI", "int", placeholder=str(self.roi))
-
-        label_box = QHBoxLayout()
-        label_box.addWidget(label_ms)
-        label_box.addWidget(input_ms)
-        label_box.addWidget(label_xsteps)
-        label_box.addWidget(input_xsteps)
-        label_box.addWidget(label_ysteps)
-        label_box.addWidget(input_ysteps)
-        label_box.addWidget(label_roi)
-        label_box.addWidget(input_roi)
+        # Connect a signal to input1 to store its text as a variable
+        self.fsm_components.input_ms.returnPressed.connect(lambda: self._store_dwell_time(self.fsm_components.input_ms.text()))
+        self.fsm_components.input_xsteps.returnPressed.connect(lambda: self._store_xsteps(self.fsm_components.input_xsteps.text()))
+        self.fsm_components.input_ysteps.returnPressed.connect(lambda: self._store_ysteps(self.fsm_components.input_ysteps.text()))
+        self.fsm_components.input_roi.returnPressed.connect(lambda: self._store_roi(self.fsm_components.input_roi.text()))
 
         ########################################
         #### Create a grid layout container ####
         ########################################
         grid_layout = QGridLayout()
-        grid_layout.addLayout(label_box, 0, 0)
+        grid_layout.addLayout(self.label_box, 0, 0)
         grid_layout.addLayout(self.button_box, 1, 0, 1, 2)
         grid_layout.addLayout(self.hbox, 2, 0, 1, 2)
         grid_layout.addWidget(self.plot_widget, 3, 0, 2, 2)
-
-        # Set the layout for the widget
-        self.setLayout(grid_layout)
+        self.setLayout(grid_layout) # Set the layout for the widget
 
         # Create a timer to update the value every 10 ms
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_position)
         self.timer.start(10)  # interval is in milliseconds
         # super().qtimer(self.update_position, 10)
-
-        # Connect a signal to input1 to store its text as a variable
-        input_ms.returnPressed.connect(lambda: self._store_dwell_time(input_ms.text()))
-        input_xsteps.returnPressed.connect(lambda: self._store_xsteps(input_xsteps.text()))
-        input_ysteps.returnPressed.connect(lambda: self._store_ysteps(input_ysteps.text()))
-        input_roi.returnPressed.connect(lambda: self._store_roi(input_roi.text()))
 
         self.show()
 
@@ -226,17 +210,17 @@ class FSMGuiComponents(GUICore):
         self.hbox.addWidget(self.groupbox2)
 
         # Create the three form inputs and their labels
-        label_ms, input_ms = super()._create_label("Dwell time (ms)", "int", placeholder=str(self.dwell_ms))
-        label_xsteps, input_xsteps = super()._create_label("X steps", "int", placeholder=str(self.xsteps))
-        label_ysteps, input_ysteps = super()._create_label("Y steps", "int", placeholder=str(self.ysteps))
-        label_roi, input_roi = super()._create_label("ROI", "int", placeholder=str(self.roi))
+        self.label_ms, self.input_ms = super()._create_label("Dwell time (ms)", "int", placeholder=str(self.dwell_ms))
+        self.label_xsteps, self.input_xsteps = super()._create_label("X steps", "int", placeholder=str(self.xsteps))
+        self.label_ysteps, self.input_ysteps = super()._create_label("Y steps", "int", placeholder=str(self.ysteps))
+        self.label_roi, self.input_roi = super()._create_label("ROI", "int", placeholder=str(self.roi))
 
         self.label_box = QHBoxLayout()
-        self.label_box.addWidget(label_ms)
-        self.label_box.addWidget(input_ms)
-        self.label_box.addWidget(label_xsteps)
-        self.label_box.addWidget(input_xsteps)
-        self.label_box.addWidget(label_ysteps)
-        self.label_box.addWidget(input_ysteps)
-        self.label_box.addWidget(label_roi)
-        self.label_box.addWidget(input_roi)
+        self.label_box.addWidget(self.label_ms)
+        self.label_box.addWidget(self.input_ms)
+        self.label_box.addWidget(self.label_xsteps)
+        self.label_box.addWidget(self.input_xsteps)
+        self.label_box.addWidget(self.label_ysteps)
+        self.label_box.addWidget(self.input_ysteps)
+        self.label_box.addWidget(self.label_roi)
+        self.label_box.addWidget(self.input_roi)
