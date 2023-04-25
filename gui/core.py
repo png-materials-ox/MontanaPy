@@ -19,6 +19,7 @@ class GUICore(QWidget):
         super().__init__(parent)
         logging.basicConfig(filename='log/log.log', level=logging.DEBUG,
                             format='%(asctime)s %(levelname)s:%(message)s')
+        self.logging = logging.getLogger("log/log.log")
 
     @staticmethod
     def _create_button(name, layout):

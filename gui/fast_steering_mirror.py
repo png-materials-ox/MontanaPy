@@ -14,11 +14,6 @@ from gui.threads.fsm_threads import ScanThread, PlotFSMThread
 
 import numpy as np
 
-import logging
-
-logging.basicConfig(filename='log/log.log', level=logging.DEBUG,
-                            format='%(asctime)s %(levelname)s:%(message)s')
-
 class FSM(GUICore):
     def __init__(self):
         super().__init__()
@@ -106,27 +101,27 @@ class FSM(GUICore):
 
     def _store_dwell_time(self, text):
         self.dwell_time = int(text) / 1000
-        logging.info("Dwell time set to {:f} ms".format(self.dwell_time*1000))
+        self.logging.info("Dwell time set to {:f} ms".format(self.dwell_time*1000))
 
     def _store_xsteps(self, text):
         self.xsteps = int(text)
-        logging.info("X steps time set to {:f}".format(self.xsteps))
+        self.logging.info("X steps time set to {:f}".format(self.xsteps))
 
     def _store_ysteps(self, text):
         self.ysteps = float(text)
-        logging.info("Y steps time set to {:f}".format(self.ysteps))
+        self.logging.info("Y steps time set to {:f}".format(self.ysteps))
 
     def _store_roi(self, text):
         self.roi = float(text)
-        logging.info("ROI set to {:f}".format(self.roi))
+        self.logging.info("ROI set to {:f}".format(self.roi))
 
     def _on_start_click(self):
-        logging.info('FSM start button clicked')
+        self.logging.info('FSM start button clicked')
         self.scan_thread.start()
         self.plot_thread.start()
 
     def _on_stop_click(self):
-        logging.info('FSM stop button clicked')
+        self.logging.info('FSM stop button clicked')
         self.scan_thread.stop_flag = True
         self.plot_thread.stop_flag = True
 
