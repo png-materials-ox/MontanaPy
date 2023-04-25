@@ -27,65 +27,57 @@ class SPC(QMainWindow):
             style = f.read()
             self.setStyleSheet(style)
 
+        self.resize(1000, 600)
+
+        # Setup the graph widget
         self.graphWidget = pg.PlotWidget()
         self.graphWidget.setObjectName("graphWidget")
         self.graphWidget.setStyleSheet(style)
-        self.resize(1000, 600)
-
-        # create a linear gradient for the background color
-        grad = GUICore._gradient_plot_backround(self.graphWidget)
-
-        # set the background brush of the plot widget to the gradient
+        grad = GUICore._gradient_plot_backround(self.graphWidget)  # color gradient
         self.graphWidget.setBackgroundBrush(grad)
         self.setCentralWidget(self.graphWidget)
 
+        ps = PlotStyling(self.graphWidget)
+        self.graphWidget.setTitle("Single Photon Counter", **ps.title_style)
+        self.graphWidget.setLabel('bottom', "", **ps.x_label_style)
+        self.graphWidget.setLabel('left', "Counts/s", **ps.y_label_style)
+
         # Setup the plot
+        # First generate some randon data to initially populate the plot
+        # TODO: limit the number of random points - currently too many
         self.x = list(range(100))  # 100 time points
         self.y = [randint(0, 100) for _ in range(100)]  # 100 data points
 
-        self.sample_time = 0.01
-        self.window_size = 20    # for averaging
-        self.ave_x = self.x[1:]
+        self.sample_time = 0.01  # Number of samples per second
+        self.window_size = 20    # Size of window for averaging
+        self.ave_x = self.x[1:]  # Initialise averaging
         self.rolling_ave = [(self.y[i] - self.y[i-1] / 2) for i in range(1, len(self.y))]
 
         pen = pg.mkPen(color='#ffa02f', width=4)
-        self.data_scatter = pg.ScatterPlotItem(pen=pg.mkPen(width=7, color='#ffa02f'), symbol='o', size=3)
+        self.data_scatter = pg.ScatterPlotItem(pen=pg.mkPen(width=7, color='#ffa02f'),
+                                               symbol='o', size=3)
         self.data_scatter.setOpacity(0.2)
-        self.ave_line = self.graphWidget.plot(self.rolling_ave, pen=pen)
+        self.ave_line = self.graphWidget.plot(self.rolling_ave, pen=pen)  # Average line of scatter pts
 
         self.graphWidget.addItem(self.data_scatter)
         self.graphWidget.addItem(self.ave_line)
 
         self.textItem = pg.TextItem(anchor=(0, 2))
 
+        # Attach timer for updating the SPC plot, connecting to update function
         self.timer = QtCore.QTimer()
         self.timer.setInterval(10)
         self.timer.timeout.connect(self.update_plot_data)
         self.timer.start()
 
-        ps = PlotStyling()
-        self.graphWidget.setTitle("Single Photon Counter", **ps.title_style)
-        self.graphWidget.setLabel('bottom', "", **ps.x_label_style)
-        self.graphWidget.setLabel('left', "Counts/s", **ps.y_label_style)
-
-        x_axis = self.graphWidget.getAxis('bottom')
-        x_tick_font = pg.QtGui.QFont('Arial', 12, weight=pg.QtGui.QFont.Bold)
-        x_axis.setTickFont(x_tick_font)
-        x_axis.setPen(pg.mkPen(color='#FFFFFF'))
-
-        y_axis = self.graphWidget.getAxis('left')
-        y_tick_font = pg.QtGui.QFont('Arial', 12, weight=pg.QtGui.QFont.Bold)
-        y_axis.setTickFont(y_tick_font)
-        y_axis.setPen(pg.mkPen(color='#FFFFFF'))
-
-        widget = QWidget()
-        layout = QGridLayout()
-        widget.setLayout(layout)
-
         self.start_btn = self.spc_components.start_btn
         self.stop_btn = self.spc_components.stop_btn
         self.ave_label = QLabel()
         self.ave_label.setText(str(self.rolling_ave[-1]))
+
+        widget = QWidget()
+        layout = QGridLayout()
+        widget.setLayout(layout)
 
         layout.addWidget(self.start_btn, 0, 0)
         layout.addWidget(self.stop_btn, 0, 1)
@@ -110,14 +102,28 @@ class SPC(QMainWindow):
         self.setLayout(layout)
 
     def store_sample_time(self, text):
+        '''
+
+        :param text:
+        :return:
+        '''
         self.sample_time = float(text)/1000
         print("Input 1:", self.sample_time)
 
     def store_window_size(self, text):
+        '''
+
+        :param text:
+        :return:
+        '''
         self.window_size = int(text)
         print("Input 2:", self.window_size)
 
     def update_plot_data(self):
+        '''
+
+        :return:
+        '''
 
         self.x = self.x[1:]  # Remove the first y element.
 
@@ -175,8 +181,19 @@ class SPCGuiComponents(GUICore):
         self.label_winsize, self.input_winsize = GUICore._create_label("Average Range", "int")
         self.label_3, self.input_3 = GUICore._create_label("", "int")
 
+
 class PlotStyling:
-    def __init__(self):
+    def __init__(self, gw):
         self.title_style = {'color': '#FFFFFF', 'font-size': '24pt', 'font-weight': 'bold'}
         self.x_label_style = {'color': '#FFFFFF', 'font-size': '12pt', 'font-weight': 'bold'}
         self.y_label_style = {'color': '#FFFFFF', 'font-size': '12pt', 'font-weight': 'bold'}
+
+        self.x_axis = gw.getAxis('bottom')
+        x_tick_font = pg.QtGui.QFont('Arial', 12, weight=pg.QtGui.QFont.Bold)
+        self.x_axis.setTickFont(x_tick_font)
+        self.x_axis.setPen(pg.mkPen(color='#FFFFFF'))
+
+        self.y_axis = gw.getAxis('left')
+        y_tick_font = pg.QtGui.QFont('Arial', 12, weight=pg.QtGui.QFont.Bold)
+        self.y_axis.setTickFont(y_tick_font)
+        self.y_axis.setPen(pg.mkPen(color='#FFFFFF'))
