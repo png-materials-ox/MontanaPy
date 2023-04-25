@@ -33,7 +33,8 @@ class GUICore(QWidget):
     def _create_button(name, layout):
         button = QPushButton(name)
         button.setObjectName(name)
-        layout.addWidget(button)
+        if layout:
+            layout.addWidget(button)
         return button
 
     @staticmethod
