@@ -14,19 +14,20 @@ import pyqtgraph as pg
 import os
 from contextlib import contextmanager
 import logging
+from core import Core
 
 class GUICore(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        # conf_path = os.path.join(os.getcwd() + "\\config\\config.json")
-        #
-        # with self._open_config(conf_path) as config:
-        #     self.daq = config["hardware"]["nicard"]  # Daq device ID
+        conf_path = os.path.join(os.getcwd() + "\\config\\config.json")
 
-        logging.basicConfig(filename='log/log.log', level=logging.DEBUG,
+        with Core()._open_config(conf_path) as config:
+            self.logfile = config["debug"]["logfile"]
+
+        logging.basicConfig(filename=self.logfile, level=logging.DEBUG,
                             format='%(asctime)s %(levelname)s:%(message)s')
-        self.logging = logging.getLogger("log/log.log")
+        self.logging = logging.getLogger(self.logfile)
 
     @staticmethod
     def _create_button(name, layout):

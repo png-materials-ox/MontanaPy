@@ -8,8 +8,10 @@ from core import Core
 class FSM:
 
     def __init__(self):
-        with open(os.path.join(os.getcwd(), "config", "config.json")) as f:
-            self.config = json.load(f)
+        conf_path = os.path.join(os.getcwd() + "\\config\\config.json")
+
+        with Core()._open_config(conf_path) as config:
+            self.config = config
 
         self.x_channel = self.config['hardware']['nicard']['fsm_x_volt_chan']
         self.y_channel = self.config['hardware']['nicard']['fsm_y_volt_chan']
@@ -43,7 +45,6 @@ class FSM:
         self.daq.set_ao_voltage(self.fsm_x_chan_o, 0)
         self.daq.set_ao_voltage(self.fsm_y_chan_o, 0)
 
-
     def voltage_to_position(self, vin, um_per_V):
         return vin * ((self.focal_length / self.mag) * (um_per_V / self.f_tele))
 
@@ -53,6 +54,7 @@ class FSM:
     def scan_xy(self, x=[], y=[], dwell_ms=10):
         # self.daq.scan_xy(x_waveform=x, y_waveform=y, dwell_ms=dwell_ms)
         self.daq.scan_xy(x=x, y=y, dwell_ms=dwell_ms)
+
     def calc_scan_voltage_range(self, roi=50):
         # If the ROI is not selected, zero the FSM
         self.zero_fsm()

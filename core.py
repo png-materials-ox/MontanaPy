@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 import json
 
+
 class Core:
     def __init__(self):
         pass
