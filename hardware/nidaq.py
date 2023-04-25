@@ -97,7 +97,58 @@ class DAQ:
     def scan_voltage(self):
         pass
 
-    def scan_xy(self, x_waveform=[], y_waveform=[], dwell_ms=10):
+    # def scan_xy(self, x_waveform=[], y_waveform=[], dwell_ms=10):
+    #     """
+    #         Generates a two-dimensional waveform using the x and y waveform inputs and scans it using
+    #         the nidaqmx.Task object in a finite acquisition mode. The function opens the Task
+    #         object using the _open_task context manager and configures the analog output channels for
+    #         the x and y channels. It sets the sample clock rate and total number of samples for the
+    #         acquisition, writes the waveform to the Task object, and starts the acquisition. The
+    #         acquisition is then stopped and the Task object is closed.
+    #
+    #         :param x_waveform:  A list of values representing the x-axis waveform to be generated and
+    #                             scanned.
+    #         :type x_waveform:   list
+    #
+    #         :param y_waveform:  A list of values representing the y-axis waveform to be generated and
+    #                             scanned.
+    #         :type y_waveform:   list
+    #
+    #         :param x_rate: The sampling rate for the x-axis waveform in Hz.
+    #         :type x_rate: float
+    #
+    #         :param y_rate: The sampling rate for the y-axis waveform in Hz.
+    #         :type y_rate: float
+    #
+    #         :raises ValueError: If the length of the x_waveform and y_waveform arrays are not the same.
+    #
+    #         :return: None
+    #         """
+    #     with self._open_task() as task:
+    #         task.ao_channels.add_ao_voltage_chan(self.fsm_x_chan_o)
+    #         task.ao_channels.add_ao_voltage_chan(self.fsm_y_chan_o)
+    #         task.ao_channels.all.ao_max = 10 #TODO put in config file
+    #         task.ao_channels.all.ao_min = -10
+    #
+    #         # task.timing.cfg_samp_clk_timing(
+    #         #     rate=max(x_rate, y_rate),
+    #         #     sample_mode=AcquisitionType.FINITE,
+    #         #     samps_per_chan=len(x_waveform) + len(y_waveform)
+    #         # )
+    #
+    #         task.start()
+    #         for i in range(len(x_waveform)):
+    #             for j in range(len(y_waveform)):
+    #                 task.write(
+    #                     [x_waveform[i], y_waveform[j]],
+    #                     auto_start=False
+    #                 )
+    #                 time.sleep(dwell_ms/1000)
+    #
+    #         task.stop()
+    #         task.wait_until_done(timeout=nidaqmx.constants.WAIT_INFINITELY)
+
+    def scan_xy(self, x=1, y=1, dwell_ms=10):
         """
             Generates a two-dimensional waveform using the x and y waveform inputs and scans it using
             the nidaqmx.Task object in a finite acquisition mode. The function opens the Task
@@ -114,11 +165,6 @@ class DAQ:
                                 scanned.
             :type y_waveform:   list
 
-            :param x_rate: The sampling rate for the x-axis waveform in Hz.
-            :type x_rate: float
-
-            :param y_rate: The sampling rate for the y-axis waveform in Hz.
-            :type y_rate: float
 
             :raises ValueError: If the length of the x_waveform and y_waveform arrays are not the same.
 
@@ -130,20 +176,9 @@ class DAQ:
             task.ao_channels.all.ao_max = 10 #TODO put in config file
             task.ao_channels.all.ao_min = -10
 
-            # task.timing.cfg_samp_clk_timing(
-            #     rate=max(x_rate, y_rate),
-            #     sample_mode=AcquisitionType.FINITE,
-            #     samps_per_chan=len(x_waveform) + len(y_waveform)
-            # )
-
             task.start()
-            for i in range(len(x_waveform)):
-                for j in range(len(y_waveform)):
-                    task.write(
-                        [x_waveform[i], y_waveform[j]],
-                        auto_start=False
-                    )
-                    time.sleep(dwell_ms/1000)
+            task.write([x, y], auto_start=False)
+            time.sleep(dwell_ms/1000)
 
             task.stop()
             task.wait_until_done(timeout=nidaqmx.constants.WAIT_INFINITELY)

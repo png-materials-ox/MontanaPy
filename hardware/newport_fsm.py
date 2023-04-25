@@ -51,8 +51,8 @@ class FSM:
         return position / ((self.focal_length / self.mag) * (um_per_V / self.f_tele))
 
     def scan_xy(self, x=[], y=[], dwell_ms=10):
-        self.daq.scan_xy(x_waveform=x, y_waveform=y, dwell_ms=dwell_ms)
-
+        # self.daq.scan_xy(x_waveform=x, y_waveform=y, dwell_ms=dwell_ms)
+        self.daq.scan_xy(x=x, y=y, dwell_ms=dwell_ms)
     def calc_scan_voltage_range(self, roi=50):
         # If the ROI is not selected, zero the FSM
         self.zero_fsm()

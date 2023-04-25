@@ -44,7 +44,6 @@ class FSM(GUICore):
         sr = self.fsm.calc_scan_voltage_range(roi=self.roi)
 
         self.x = list(np.linspace(sr['x_min'], sr['x_max'], self.xsteps))
-        print(self.x)
         self.y = list(np.linspace(sr['y_min'], sr['y_max'], self.xsteps))
 
         ########################
@@ -227,16 +226,16 @@ class ScanThread(QThread):
 
     def run(self):
         logging.info('ScanThread run')
-        while not self.stop_flag:
-            self.fsm.scan_xy(x=self.x, y=self.y, dwell_ms=self.dwell_ms)
-        logging.info('ScanThread stopped')
-        return
-        # for i in range(len(self.x)):
-        #     for j in range(len(self.y)):
-        #         if self.stop_flag:
-        #             logging.info('ScanThread stopped')
-        #             return
-        #         self.fsm.scan_xy(x=self.x[i], y=self.y[j], dwell_ms=self.dwell_ms)
+        # while not self.stop_flag:
+        #     self.fsm.scan_xy(x=self.x, y=self.y, dwell_ms=self.dwell_ms)
+        # logging.info('ScanThread stopped')
+        # return
+        for i in range(len(self.x)):
+            for j in range(len(self.y)):
+                if self.stop_flag:
+                    logging.info('ScanThread stopped')
+                    return
+                self.fsm.scan_xy(x=self.x[i], y=self.y[j], dwell_ms=self.dwell_ms)
 
 
 class PlotFSMThread(QThread):
