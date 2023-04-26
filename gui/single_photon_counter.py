@@ -28,18 +28,10 @@ class SPC(QMainWindow):
 
         self.resize(1000, 600)
 
-        # Setup the graph widget
-        self.graphWidget = pg.PlotWidget()
-        self.graphWidget.setObjectName("graphWidget")
-        self.graphWidget.setStyleSheet(style)
-        grad = GUICore._gradient_plot_backround(self.graphWidget)  # color gradient
-        self.graphWidget.setBackgroundBrush(grad)
-        self.setCentralWidget(self.graphWidget)
+        plotting = Plotting(style)
 
-        ps = PlotStyling(self.graphWidget)
-        self.graphWidget.setTitle("Single Photon Counter", **ps.title_style)
-        self.graphWidget.setLabel('bottom', "", **ps.x_label_style)
-        self.graphWidget.setLabel('left', "Counts/s", **ps.y_label_style)
+        # Setup the graph widget
+        self.spc_plot_widget = plotting.spc_plot_widget
 
         # Setup the plot
         # First generate some randon data to initially populate the plot
@@ -56,10 +48,10 @@ class SPC(QMainWindow):
         self.data_scatter = pg.ScatterPlotItem(pen=pg.mkPen(width=7, color='#ffa02f'),
                                                symbol='o', size=3)
         self.data_scatter.setOpacity(0.2)
-        self.ave_line = self.graphWidget.plot(self.rolling_ave, pen=pen)  # Average line of scatter pts
+        self.ave_line = self.spc_plot_widget.plot(self.rolling_ave, pen=pen)  # Average line of scatter pts
 
-        self.graphWidget.addItem(self.data_scatter)
-        self.graphWidget.addItem(self.ave_line)
+        self.spc_plot_widget.addItem(self.data_scatter)
+        self.spc_plot_widget.addItem(self.ave_line)
 
         self.textItem = pg.TextItem(anchor=(0, 2))
 
@@ -88,7 +80,7 @@ class SPC(QMainWindow):
         layout.addWidget(self.spc_components.input_winsize, 1, 3)
         layout.addWidget(self.spc_components.label_3, 1, 5)
 
-        layout.addWidget(self.graphWidget, 2, 0, 2, 6)
+        layout.addWidget(self.spc_plot_widget, 2, 0, 2, 6)
 
         self.setCentralWidget(widget)
 
@@ -179,6 +171,22 @@ class SPCGuiComponents(GUICore):
         self.label_ms, self.input_ms = GUICore._create_label("Dwell time (ms)", "int")
         self.label_winsize, self.input_winsize = GUICore._create_label("Average Range", "int")
         self.label_3, self.input_3 = GUICore._create_label("", "int")
+
+
+class Plotting(GUICore):
+    def __init__(self, style):
+        super().__init__()
+
+        self.spc_plot_widget = pg.PlotWidget()
+        self.spc_plot_widget.setObjectName("spc_graph")
+        self.spc_plot_widget.setStyleSheet(style)
+        grad = super()._gradient_plot_backround(self.spc_plot_widget)  # color gradient
+        self.spc_plot_widget.setBackgroundBrush(grad)
+
+        ps = PlotStyling(self.spc_plot_widget)
+        self.spc_plot_widget.setTitle("Single Photon Counter", **ps.title_style)
+        self.spc_plot_widget.setLabel('bottom', "", **ps.x_label_style)
+        self.spc_plot_widget.setLabel('left', "Counts/s", **ps.y_label_style)
 
 
 class PlotStyling:
