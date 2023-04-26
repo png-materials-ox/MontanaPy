@@ -93,7 +93,7 @@ class Confocal(GUICore):
 
 
         grid_layout = QGridLayout()
-        grid_layout.addWidget(button, 0, 0)
+        # grid_layout.addWidget(button, 0, 0)
         grid_layout.addLayout(qb, 0, 3)
         grid_layout.addWidget(self.tst_plot_widget, 1, 0, 2, 2)
         grid_layout.addWidget(self.spc_plot_widget, 1, 2, 2, 2)

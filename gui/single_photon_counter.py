@@ -15,10 +15,10 @@ from hardware.nidaq import DAQ
 from gui.core import GUICore
 
 class SPCCore:
-    def __init__(self, *args, **kwargs):
-        super(SPC, self).__init__(*args, **kwargs)
-
+    def __init__(self, style=None):
         self.spc_components = SPCGuiComponents()
+        plotting = Plotting(style)
+        self.spc_plot_widget = plotting.spc_plot_widget
 
         # First generate some randon data to initially populate the plot
         # TODO: limit the number of random points - currently too many
@@ -30,17 +30,26 @@ class SPCCore:
         self.ave_x = self.x[1:]  # Initialise averaging
         self.rolling_ave = [(self.y[i] - self.y[i-1] / 2) for i in range(1, len(self.y))]
 
+        pen = pg.mkPen(color='#ffa02f', width=4)
+        self.data_scatter = pg.ScatterPlotItem(pen=pg.mkPen(width=7, color='#ffa02f'),
+                                               symbol='o', size=3)
+        self.data_scatter.setOpacity(0.2)
+        self.ave_line = self.spc_plot_widget.plot(self.rolling_ave, pen=pen)  # Average line of scatter pts
+
         # Attach timer for updating the SPC plot, connecting to update function
         self.timer = QtCore.QTimer()
         self.timer.setInterval(10)
         self.timer.timeout.connect(self.update_plot_data)
-        self.timer.start()
+        # self.timer.start()
 
         # Connect a signal to input1 to store its text as a variable
         self.spc_components.input_ms.returnPressed.connect(lambda:
                                     self.store_sample_time(self.spc_components.input_ms.text()))
         self.spc_components.input_winsize.returnPressed.connect(lambda:
                                     self.store_window_size(self.spc_components.input_winsize.text()))
+
+        self.ave_label = QLabel()
+        self.ave_label.setText(str(self.rolling_ave[-1]))
 
     def store_sample_time(self, text):
         '''
@@ -95,52 +104,58 @@ class SPC(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(SPC, self).__init__(*args, **kwargs)
 
-        self.spc_components = SPCGuiComponents()
-
         # Load stylesheet
         with open(os.path.join(os.getcwd() + "\\css\\single_photon_counter.css"), 'r') as f:
             style = f.read()
             self.setStyleSheet(style)
 
-        self.resize(1000, 600)
-
+        core = SPCCore(style=style)
+        self.spc_components = SPCGuiComponents()
         plotting = Plotting(style)
 
-        # Setup the graph widget
-        self.spc_plot_widget = plotting.spc_plot_widget
+        self.resize(1000, 600)
 
-        # Setup the plot
-        # First generate some randon data to initially populate the plot
-        # TODO: limit the number of random points - currently too many
-        self.x = list(range(100))  # 100 time points
-        self.y = [randint(0, 100) for _ in range(100)]  # 100 data points
+        self.spc_plot_widget = core.spc_plot_widget
 
-        self.sample_time = 0.01  # Number of samples per second
-        self.window_size = 20    # Size of window for averaging
-        self.ave_x = self.x[1:]  # Initialise averaging
-        self.rolling_ave = [(self.y[i] - self.y[i-1] / 2) for i in range(1, len(self.y))]
 
-        pen = pg.mkPen(color='#ffa02f', width=4)
-        self.data_scatter = pg.ScatterPlotItem(pen=pg.mkPen(width=7, color='#ffa02f'),
-                                               symbol='o', size=3)
-        self.data_scatter.setOpacity(0.2)
-        self.ave_line = self.spc_plot_widget.plot(self.rolling_ave, pen=pen)  # Average line of scatter pts
+        # # Setup the graph widget
+        # self.spc_plot_widget = plotting.spc_plot_widget
+        #
+        # # Setup the plot
+        # # First generate some randon data to initially populate the plot
+        # # TODO: limit the number of random points - currently too many
+        # self.x = list(range(100))  # 100 time points
+        # self.y = [randint(0, 100) for _ in range(100)]  # 100 data points
 
-        self.spc_plot_widget.addItem(self.data_scatter)
-        self.spc_plot_widget.addItem(self.ave_line)
+        # self.sample_time = 0.01  # Number of samples per second
+        # self.window_size = 20    # Size of window for averaging
+        # self.ave_x = self.x[1:]  # Initialise averaging
+        # self.rolling_ave = [(self.y[i] - self.y[i-1] / 2) for i in range(1, len(self.y))]
+
+        # pen = pg.mkPen(color='#ffa02f', width=4)
+        # self.data_scatter = pg.ScatterPlotItem(pen=pg.mkPen(width=7, color='#ffa02f'),
+        #                                        symbol='o', size=3)
+        # self.data_scatter.setOpacity(0.2)
+        # self.ave_line = self.spc_plot_widget.plot(self.rolling_ave, pen=pen)  # Average line of scatter pts
+        #
+        # self.spc_plot_widget.addItem(self.data_scatter)
+        # self.spc_plot_widget.addItem(self.ave_line)
 
         self.textItem = pg.TextItem(anchor=(0, 2))
 
-        # Attach timer for updating the SPC plot, connecting to update function
-        self.timer = QtCore.QTimer()
-        self.timer.setInterval(10)
-        self.timer.timeout.connect(self.update_plot_data)
+        # # Attach timer for updating the SPC plot, connecting to update function
+        # self.timer = QtCore.QTimer()
+        # self.timer.setInterval(10)
+        # self.timer.timeout.connect(self.update_plot_data)
+        # self.timer.start()
+
+        self.timer = core.timer
         self.timer.start()
 
         self.start_btn = self.spc_components.start_btn
         self.stop_btn = self.spc_components.stop_btn
-        self.ave_label = QLabel()
-        self.ave_label.setText(str(self.rolling_ave[-1]))
+        # self.ave_label = QLabel()
+        # self.ave_label.setText(str(self.rolling_ave[-1]))
 
         widget = QWidget()
         layout = QGridLayout()
@@ -148,7 +163,7 @@ class SPC(QMainWindow):
 
         layout.addWidget(self.start_btn, 0, 0)
         layout.addWidget(self.stop_btn, 0, 1)
-        layout.addWidget(self.ave_label, 0, 5)
+        layout.addWidget(core.ave_label, 0, 5)
 
         layout.addWidget(self.spc_components.label_ms, 1, 0)
         layout.addWidget(self.spc_components.input_ms, 1, 1)
@@ -160,11 +175,11 @@ class SPC(QMainWindow):
 
         self.setCentralWidget(widget)
 
-        # Connect a signal to input1 to store its text as a variable
-        self.spc_components.input_ms.returnPressed.connect(lambda:
-                                    self.store_sample_time(self.spc_components.input_ms.text()))
-        self.spc_components.input_winsize.returnPressed.connect(lambda:
-                                    self.store_window_size(self.spc_components.input_winsize.text()))
+        # # Connect a signal to input1 to store its text as a variable
+        # self.spc_components.input_ms.returnPressed.connect(lambda:
+        #                             self.store_sample_time(self.spc_components.input_ms.text()))
+        # self.spc_components.input_winsize.returnPressed.connect(lambda:
+        #                             self.store_window_size(self.spc_components.input_winsize.text()))
 
         self.setLayout(layout)
 
