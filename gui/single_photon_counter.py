@@ -14,6 +14,82 @@ import numpy as np
 from hardware.nidaq import DAQ
 from gui.core import GUICore
 
+class SPCCore:
+    def __init__(self, *args, **kwargs):
+        super(SPC, self).__init__(*args, **kwargs)
+
+        self.spc_components = SPCGuiComponents()
+
+        # First generate some randon data to initially populate the plot
+        # TODO: limit the number of random points - currently too many
+        self.x = list(range(100))  # 100 time points
+        self.y = [randint(0, 100) for _ in range(100)]  # 100 data points
+
+        self.sample_time = 0.01  # Number of samples per second
+        self.window_size = 20    # Size of window for averaging
+        self.ave_x = self.x[1:]  # Initialise averaging
+        self.rolling_ave = [(self.y[i] - self.y[i-1] / 2) for i in range(1, len(self.y))]
+
+        # Attach timer for updating the SPC plot, connecting to update function
+        self.timer = QtCore.QTimer()
+        self.timer.setInterval(10)
+        self.timer.timeout.connect(self.update_plot_data)
+        self.timer.start()
+
+        # Connect a signal to input1 to store its text as a variable
+        self.spc_components.input_ms.returnPressed.connect(lambda:
+                                    self.store_sample_time(self.spc_components.input_ms.text()))
+        self.spc_components.input_winsize.returnPressed.connect(lambda:
+                                    self.store_window_size(self.spc_components.input_winsize.text()))
+
+    def store_sample_time(self, text):
+        '''
+
+        :param text:
+        :return:
+        '''
+        self.sample_time = float(text)/1000
+        print("Input 1:", self.sample_time)
+
+    def store_window_size(self, text):
+        '''
+
+        :param text:
+        :return:
+        '''
+        self.window_size = int(text)
+        print("Input 2:", self.window_size)
+
+    def update_plot_data(self):
+        '''
+
+        :return:
+        '''
+
+        self.x = self.x[1:]  # Remove the first y element.
+
+        self.y = self.y[1:]  # Remove the first
+        self.ave_x = self.ave_x[1:]
+        self.rolling_ave = self.rolling_ave[1:]
+        time_total = 0
+
+        daq = DAQ()
+        p = daq.counter(self.sample_time)
+
+        time_total = self.x[-1] + 1
+
+        self.x.append(time_total)
+        self.y.append(p)
+        self.data_scatter.setData(self.x, self.y)
+
+        self.ave_x.append(self.x[-self.window_size])
+        self.rolling_ave.append(sum(self.y[-self.window_size:]) / self.window_size)
+
+        self.ave_line.setData(self.ave_x, self.rolling_ave)
+
+        self.ave_label.setText(str(self.rolling_ave[-1]))
+
+
 class SPC(QMainWindow):
 
     def __init__(self, *args, **kwargs):

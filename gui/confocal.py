@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
 from PySide6 import QtWidgets
 from PySide6.QtCore import Qt, QTimer
 import pyqtgraph as pg
+import qtawesome as qta
 import os
 from random import randint
 import numpy as np
@@ -44,6 +45,9 @@ class Confocal(GUICore):
         self.fsm_plot_widget = plotting.fsm_plot_widget
         self.tst_plot_widget = plotting.tst_plot_widget          # Test plot widget
 
+        # # < iclass ="fa-regular fa-play" style="color: #ffaa00;" > < /i >
+        # icon = qta.icon("fa5s.play")
+        # button = QPushButton(icon, "Home")
 
 
 
@@ -81,7 +85,7 @@ class Confocal(GUICore):
         self.ave_label.setText(str(self.rolling_ave[-1]))
 
         qb = QHBoxLayout()
-        qb.addWidget(self.spc_components.label_ms)
+        # qb.addWidget(self.spc_components.label_ms)
         qb.addWidget(self.spc_components.input_ms)
         qb.addWidget(self.spc_components.label_winsize)
         qb.addWidget(self.spc_components.input_winsize)
@@ -89,6 +93,7 @@ class Confocal(GUICore):
 
 
         grid_layout = QGridLayout()
+        grid_layout.addWidget(button, 0, 0)
         grid_layout.addLayout(qb, 0, 3)
         grid_layout.addWidget(self.tst_plot_widget, 1, 0, 2, 2)
         grid_layout.addWidget(self.spc_plot_widget, 1, 2, 2, 2)
