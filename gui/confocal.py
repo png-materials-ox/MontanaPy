@@ -75,21 +75,57 @@ class Confocal(GUICore):
         self.timer.timeout.connect(self.update_plot_data)
         self.timer.start()
 
+        self.start_btn = self.spc_components.start_btn
+        self.stop_btn = self.spc_components.stop_btn
+        self.ave_label = QLabel()
+        self.ave_label.setText(str(self.rolling_ave[-1]))
 
-
+        qb = QHBoxLayout()
+        qb.addWidget(self.spc_components.label_ms)
+        qb.addWidget(self.spc_components.input_ms)
+        qb.addWidget(self.spc_components.label_winsize)
+        qb.addWidget(self.spc_components.input_winsize)
 
 
 
         grid_layout = QGridLayout()
-        grid_layout.addWidget(self.tst_plot_widget, 0, 0, 2, 2)
-        grid_layout.addWidget(self.spc_plot_widget, 0, 2, 2, 2)
-        grid_layout.addLayout(self.fsm_components.label_box, 2, 3)
-        grid_layout.addLayout(self.fsm_components.button_box, 3, 3, 1, 2)
-        grid_layout.addLayout(self.fsm_components.hbox, 4, 3, 1, 2)
-        grid_layout.addWidget(self.fsm_plot_widget, 5, 3, 2, 2)
+        grid_layout.addLayout(qb, 0, 3)
+        grid_layout.addWidget(self.tst_plot_widget, 1, 0, 2, 2)
+        grid_layout.addWidget(self.spc_plot_widget, 1, 2, 2, 2)
+        grid_layout.addLayout(self.fsm_components.label_box, 3, 3)
+        grid_layout.addLayout(self.fsm_components.button_box, 4, 3, 1, 2)
+        grid_layout.addLayout(self.fsm_components.hbox, 5, 3, 1, 2)
+        grid_layout.addWidget(self.fsm_plot_widget, 6, 3, 2, 2)
         self.setLayout(grid_layout)  # Set the layout for the widget
 
         self.show()
+
+        # Connect a signal to input1 to store its text as a variable
+        self.spc_components.input_ms.returnPressed.connect(lambda:
+                                                           self.store_sample_time(self.spc_components.input_ms.text()))
+        self.spc_components.input_winsize.returnPressed.connect(lambda:
+                                                                self.store_window_size(
+                                                                    self.spc_components.input_winsize.text()))
+
+        # self.setLayout(layout)
+
+    def store_sample_time(self, text):
+        '''
+
+        :param text:
+        :return:
+        '''
+        self.sample_time = float(text) / 1000
+        print("Input 1:", self.sample_time)
+
+    def store_window_size(self, text):
+        '''
+
+        :param text:
+        :return:
+        '''
+        self.window_size = int(text)
+        print("Input 2:", self.window_size)
 
     def update_plot_data(self):
         '''
