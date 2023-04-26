@@ -1422,3 +1422,61 @@
 2023-04-25 19:20:45,001 INFO:PlotThread stopped
 2023-04-25 19:20:45,009 INFO:ScanThread stopped
 2023-04-25 19:20:49,102 INFO:SPC Window Opened
+2023-04-25 19:31:08,881 INFO:ScanThread called
+2023-04-25 19:31:08,882 INFO:PlotThread called
+2023-04-25 19:31:08,900 INFO:FSM Window Opened
+2023-04-25 19:31:24,041 INFO:ROI set to 10000.000000
+2023-04-25 19:31:25,492 INFO:Y steps time set to 1.000000
+2023-04-25 19:31:26,722 INFO:X steps time set to 1.000000
+2023-04-25 19:31:29,352 INFO:Dwell time set to 1.000000 ms
+2023-04-25 19:31:30,512 INFO:FSM start button clicked
+2023-04-25 19:31:30,515 INFO:PlotThread run
+2023-04-25 19:31:30,515 INFO:ScanThread run
+2023-04-25 19:31:33,683 INFO:FSM stop button clicked
+2023-04-25 19:31:33,688 INFO:PlotThread stopped
+2023-04-25 19:31:33,693 INFO:ScanThread stopped
+2023-04-25 20:04:09,435 INFO:ScanThread called
+2023-04-25 20:04:09,437 INFO:PlotThread called
+2023-04-25 20:04:09,456 INFO:FSM Window Opened
+2023-04-25 20:04:15,144 INFO:SPC Window Opened
+2023-04-25 20:07:39,336 INFO:Confocal Window Opened
+2023-04-25 20:09:15,701 INFO:Confocal Window Opened
+2023-04-25 20:11:33,906 INFO:Confocal Window Opened
+2023-04-25 20:14:10,723 INFO:Confocal Window Opened
+2023-04-25 20:23:11,698 INFO:Confocal Window Opened
+2023-04-25 20:23:28,156 INFO:Confocal Window Opened
+2023-04-25 20:23:54,821 INFO:Confocal Window Opened
+2023-04-25 20:25:14,204 INFO:AOM Window Opened
+2023-04-26 12:24:50,083 INFO:Confocal Window Opened
+2023-04-26 12:26:57,734 INFO:Confocal Window Opened
+2023-04-26 12:28:24,530 INFO:Confocal Window Opened
+2023-04-26 12:31:11,259 INFO:Confocal Window Opened
+2023-04-26 12:34:24,633 INFO:Confocal Window Opened
+2023-04-26 12:34:50,408 INFO:Confocal Window Opened
+2023-04-26 12:36:41,941 INFO:Confocal Window Opened
+2023-04-26 12:37:02,946 INFO:Confocal Window Opened
+2023-04-26 12:37:33,598 INFO:Confocal Window Opened
+2023-04-26 12:37:49,580 INFO:Confocal Window Opened
+2023-04-26 12:38:50,311 INFO:Confocal Window Opened
+2023-04-26 12:39:08,207 INFO:Confocal Window Opened
+2023-04-26 12:39:53,172 INFO:Confocal Window Opened
+2023-04-26 12:41:09,697 INFO:Confocal Window Opened
+2023-04-26 12:41:35,339 INFO:Confocal Window Opened
+2023-04-26 13:50:12,913 INFO:WLS Window Opened
+2023-04-26 14:01:45,163 INFO:ScanThread called
+2023-04-26 14:01:45,164 INFO:PlotThread called
+2023-04-26 14:01:45,188 INFO:FSM Window Opened
+2023-04-26 14:01:48,786 INFO:FSM start button clicked
+2023-04-26 14:01:48,790 INFO:ScanThread run
+2023-04-26 14:01:48,790 INFO:PlotThread run
+2023-04-26 14:01:56,777 INFO:FSM stop button clicked
+2023-04-26 14:01:56,780 INFO:PlotThread stopped
+2023-04-26 14:01:56,789 INFO:ScanThread stopped
+2023-04-26 14:02:03,217 INFO:SPC Window Opened
+2023-04-26 14:02:17,723 INFO:Confocal Window Opened
+2023-04-26 22:11:58,130 INFO:Confocal Window Opened
+2023-04-26 22:13:12,850 INFO:Confocal Window Opened
+2023-04-26 22:13:54,433 INFO:Confocal Window Opened
+2023-04-26 22:21:27,029 INFO:Confocal Window Opened
+2023-04-26 22:25:14,881 INFO:Confocal Window Opened
+2023-04-26 22:27:17,136 INFO:Confocal Window Opened

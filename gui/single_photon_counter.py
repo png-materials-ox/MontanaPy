@@ -3,7 +3,6 @@ from PySide6.QtWidgets import (
     QWidget,
     QGridLayout,
     QLabel,
-    QPushButton,
 )
 from PySide6 import QtCore
 import pyqtgraph as pg

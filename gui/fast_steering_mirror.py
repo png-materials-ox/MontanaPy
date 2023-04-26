@@ -101,7 +101,7 @@ class FSM(GUICore):
         self.show()
 
     def _store_dwell_time(self, text):
-        self.dwell_time = int(text) / 1000
+        self.dwell_ms = int(text) / 1000
         self.logging.info("Dwell time set to {:f} ms".format(self.dwell_time*1000))
 
     def _store_xsteps(self, text):
