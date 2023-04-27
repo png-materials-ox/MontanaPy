@@ -1538,3 +1538,9 @@
 2023-04-27 01:51:38,709 INFO:ScanThread called
 2023-04-27 01:51:38,711 INFO:PlotThread called
 2023-04-27 01:51:38,822 INFO:Confocal Window Opened
+2023-04-27 02:01:12,162 INFO:AOM Window Opened
+2023-04-27 02:01:18,707 INFO:EOM Window Opened
+2023-04-27 02:01:29,673 INFO:ScanThread called
+2023-04-27 02:01:29,674 INFO:PlotThread called
+2023-04-27 02:01:29,752 INFO:Confocal Window Opened
+2023-04-27 02:02:53,724 INFO:WLS Window Opened

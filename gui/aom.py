@@ -3,7 +3,7 @@ import os
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QPushButton, QVBoxLayout, QWidget
 
-from instr_ctrl.aom_ctrl import AOM_Ctrl
+from hardware.aom import AOM_Ctrl
 
 
 class AOM(QWidget):

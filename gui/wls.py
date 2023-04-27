@@ -3,7 +3,7 @@ import os
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QPushButton, QVBoxLayout, QWidget
 
-from instr_ctrl.wls_ctrl import WLS_Ctrl
+from hardware.wls import WLS_Ctrl
 
 
 class WLS(QWidget):

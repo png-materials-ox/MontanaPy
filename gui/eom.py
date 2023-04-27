@@ -3,7 +3,7 @@ import os
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QPushButton, QVBoxLayout, QWidget
 
-from instr_ctrl.eom_ctrl import EOM_Ctrl
+from hardware.eom import EOM_Ctrl
 
 class EOM(QWidget):
     def __init__(self):

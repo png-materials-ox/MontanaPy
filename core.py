@@ -3,6 +3,9 @@ import json
 
 
 class Core:
+    '''
+    Contains some core methods used commonly throughout the program.
+    '''
     def __init__(self):
         pass
 
