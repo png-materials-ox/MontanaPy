@@ -42,8 +42,6 @@ class Confocal(GUICore):
 
         spc_plotting = SPCPlotting(style)
         plotting = Plotting(style)
-        # self.spc_plot_widget = spc_plotting.spc_plot_widget
-        # self.fsm_plot_widget = plotting.fsm_plot_widget # TODO: Probably get this from each individual class
         self.tst_plot_widget = plotting.tst_plot_widget          # Test plot widget
 
         self.spc_plot_widget = spc.spc_plot_widget
@@ -53,7 +51,7 @@ class Confocal(GUICore):
         self.spc_timer = spc.timer
         self.spc_timer.start()
 
-        self.fsm_plot_widget = fsm.plot_widget
+        self.fsm_plot_widget = fsm.fsm_plot_widget
         self.fsm_timer = fsm.timer
         self.fsm_timer.start(10)  # interval is in milliseconds
 
@@ -68,7 +66,7 @@ class Confocal(GUICore):
         grid_layout.addLayout(qb, 0, 3)
         grid_layout.addWidget(self.tst_plot_widget, 1, 0, 2, 2)
         grid_layout.addWidget(self.spc_plot_widget, 1, 2, 2, 2)
-        grid_layout.addLayout(fsm.label_box, 3, 3)
+        grid_layout.addLayout(fsm.label_box, 4, 3)
         # grid_layout.addLayout(fsm.button_box, 4, 3, 1, 2)
         grid_layout.addLayout(fsm.hbox, 5, 3, 1, 2)
         grid_layout.addWidget(self.fsm_plot_widget, 6, 3, 2, 2)
@@ -81,27 +79,7 @@ class Plotting(GUICore):
     def __init__(self, style):
         super().__init__()
 
-        self.fsm_plot_widget = pg.PlotWidget()
-        grad = super()._gradient_plot_backround(self.fsm_plot_widget)  # color gradient
-        self.fsm_plot_widget.setBackgroundBrush(grad)  # set the background brush of the plot widget to the gradient
-
         # Test plot widget
         self.tst_plot_widget = pg.PlotWidget()
+        grad = super()._gradient_plot_backround(self.tst_plot_widget)  # color gradient
         self.tst_plot_widget.setBackgroundBrush(grad)  # set the background brush of the plot widget to the gradient
-
-
-class PlotStyling:
-    def __init__(self, gw):
-        self.title_style = {'color': '#FFFFFF', 'font-size': '24pt', 'font-weight': 'bold'}
-        self.x_label_style = {'color': '#FFFFFF', 'font-size': '12pt', 'font-weight': 'bold'}
-        self.y_label_style = {'color': '#FFFFFF', 'font-size': '12pt', 'font-weight': 'bold'}
-
-        self.x_axis = gw.getAxis('bottom')
-        x_tick_font = pg.QtGui.QFont('Arial', 12, weight=pg.QtGui.QFont.Bold)
-        self.x_axis.setTickFont(x_tick_font)
-        self.x_axis.setPen(pg.mkPen(color='#FFFFFF'))
-
-        self.y_axis = gw.getAxis('left')
-        y_tick_font = pg.QtGui.QFont('Arial', 12, weight=pg.QtGui.QFont.Bold)
-        self.y_axis.setTickFont(y_tick_font)
-        self.y_axis.setPen(pg.mkPen(color='#FFFFFF'))

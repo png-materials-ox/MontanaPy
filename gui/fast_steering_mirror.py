@@ -27,7 +27,7 @@ class FSM(GUICore):
         self.setWindowTitle("Display Values and Plot")
         self.setGeometry(200, 200, 800, 600)
 
-        core = FSMCore()
+        core = FSMCore(style=style)
         self.fsm = core.fsm_components
 
         ########################################
@@ -37,7 +37,7 @@ class FSM(GUICore):
         grid_layout.addLayout(core.label_box, 0, 0)
         grid_layout.addLayout(core.button_box, 1, 0, 1, 2)
         grid_layout.addLayout(core.hbox, 2, 0, 1, 2)
-        grid_layout.addWidget(core.plot_widget, 3, 0, 2, 2)
+        grid_layout.addWidget(core.fsm_plot_widget, 3, 0, 2, 2)
         self.setLayout(grid_layout) # Set the layout for the widget
 
         self.fsm_timer = core.timer
@@ -47,7 +47,7 @@ class FSM(GUICore):
 
 
 class FSMCore(GUICore):
-    def __init__(self):
+    def __init__(self, style=None):
         super().__init__()
 
         # TODO: Need to work out how to properly get these from the input forms
@@ -68,12 +68,13 @@ class FSMCore(GUICore):
         ########################
         #### Setup the plot ####
         ########################
-        self.plot_widget = pg.PlotWidget()
+        plotting = Plotting(style)
+        self.fsm_plot_widget = plotting.fsm_plot_widget
 
-        self.plot_widget.setXRange(min(self.x), max(self.x))
-        self.plot_widget.setYRange(min(self.y), max(self.y))
-        grad = super()._gradient_plot_backround(self.plot_widget)
-        self.plot_widget.setBackgroundBrush(grad)  # set the background brush of the plot widget to the gradient
+        self.fsm_plot_widget.setXRange(min(self.x), max(self.x))
+        self.fsm_plot_widget.setYRange(min(self.y), max(self.y))
+        grad = super()._gradient_plot_backround(self.fsm_plot_widget)
+        self.fsm_plot_widget.setBackgroundBrush(grad)  # set the background brush of the plot widget to the gradient
 
         # ####################################################
         # #### Buttons for starting and stopping FSM scan ####
@@ -85,7 +86,7 @@ class FSMCore(GUICore):
 
         # Need to run the processes on different threads to prevent blocking
         self.scan_thread = ScanThread(self.fsm, self.x, self.y, self.dwell_ms)
-        self.plot_thread = PlotFSMThread(self.plot_widget, self.x, self.y, self.dwell_ms)
+        self.plot_thread = PlotFSMThread(self.fsm_plot_widget, self.x, self.y, self.dwell_ms)
         self.plot_thread.update_plot.connect(self.update_plot) # Connect method to signal from thread
         self.start_button.clicked.connect(self._on_start_click)
         self.stop_button.clicked.connect(self._on_stop_click)
@@ -143,7 +144,7 @@ class FSMCore(GUICore):
 
     @Slot(list, list)
     def update_plot(self, x, y):
-        self.plot_widget.plot(x, y, pen=pg.mkPen(width=7, color='#ffa02f'), symbol='o', symbolPen='#ffa02f',
+        self.fsm_plot_widget.plot(x, y, pen=pg.mkPen(width=7, color='#ffa02f'), symbol='o', symbolPen='#ffa02f',
                               clear=True)
 
 class FSMGuiComponents(GUICore):
@@ -230,3 +231,34 @@ class FSMGuiComponents(GUICore):
         self.label_box.addWidget(self.input_ysteps)
         self.label_box.addWidget(self.label_roi)
         self.label_box.addWidget(self.input_roi)
+
+class Plotting(GUICore):
+    def __init__(self, style):
+        super().__init__()
+
+        self.fsm_plot_widget = pg.PlotWidget()
+        self.fsm_plot_widget.setObjectName("fsm_graph")
+        self.fsm_plot_widget.setStyleSheet(style)
+        grad = super()._gradient_plot_backround(self.fsm_plot_widget)  # color gradient
+        self.fsm_plot_widget.setBackgroundBrush(grad)
+
+        ps = PlotStyling(self.fsm_plot_widget)
+        self.fsm_plot_widget.setTitle("Fast Steering Mirror", **ps.title_style)
+        self.fsm_plot_widget.setLabel('bottom', "x position (um)", **ps.x_label_style)
+        self.fsm_plot_widget.setLabel('left', "y position (um)", **ps.y_label_style)
+
+class PlotStyling:
+    def __init__(self, gw):
+        self.title_style = {'color': '#FFFFFF', 'font-size': '24pt', 'font-weight': 'bold'}
+        self.x_label_style = {'color': '#FFFFFF', 'font-size': '12pt', 'font-weight': 'bold'}
+        self.y_label_style = {'color': '#FFFFFF', 'font-size': '12pt', 'font-weight': 'bold'}
+
+        self.x_axis = gw.getAxis('bottom')
+        x_tick_font = pg.QtGui.QFont('Arial', 12, weight=pg.QtGui.QFont.Bold)
+        self.x_axis.setTickFont(x_tick_font)
+        self.x_axis.setPen(pg.mkPen(color='#FFFFFF'))
+
+        self.y_axis = gw.getAxis('left')
+        y_tick_font = pg.QtGui.QFont('Arial', 12, weight=pg.QtGui.QFont.Bold)
+        self.y_axis.setTickFont(y_tick_font)
+        self.y_axis.setPen(pg.mkPen(color='#FFFFFF'))

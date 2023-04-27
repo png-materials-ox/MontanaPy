@@ -1521,3 +1521,20 @@
 2023-04-27 01:39:42,245 INFO:ScanThread called
 2023-04-27 01:39:42,246 INFO:PlotThread called
 2023-04-27 01:39:42,336 INFO:Confocal Window Opened
+2023-04-27 01:41:05,840 INFO:ScanThread called
+2023-04-27 01:41:05,842 INFO:PlotThread called
+2023-04-27 01:41:05,864 INFO:FSM Window Opened
+2023-04-27 01:41:11,683 INFO:ScanThread called
+2023-04-27 01:41:11,685 INFO:PlotThread called
+2023-04-27 01:41:11,776 INFO:Confocal Window Opened
+2023-04-27 01:44:13,622 INFO:ScanThread called
+2023-04-27 01:44:13,623 INFO:PlotThread called
+2023-04-27 01:44:13,711 INFO:Confocal Window Opened
+2023-04-27 01:50:33,880 INFO:ScanThread called
+2023-04-27 01:50:33,882 INFO:PlotThread called
+2023-04-27 01:50:33,901 INFO:FSM Window Opened
+2023-04-27 01:50:43,089 INFO:ScanThread called
+2023-04-27 01:50:43,090 INFO:PlotThread called
+2023-04-27 01:51:38,709 INFO:ScanThread called
+2023-04-27 01:51:38,711 INFO:PlotThread called
+2023-04-27 01:51:38,822 INFO:Confocal Window Opened
