@@ -135,6 +135,13 @@ class FSM(GUICore):
     def update_plot(self, x, y):
         self.plot_widget.plot(x, y, pen=pg.mkPen(width=7, color='#ffa02f'), symbol='o', symbolPen='#ffa02f', clear=True)
 
+class FSMCore(GUICore):
+    def __init__(self):
+        super().__init__()
+        super().__init__()
+        self.fsm_components = FSMGuiComponents()
+
+
 
 class FSMGuiComponents(GUICore):
     def __init__(self, xsteps, ysteps, roi, dwell_ms):
