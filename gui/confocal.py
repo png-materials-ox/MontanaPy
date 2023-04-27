@@ -18,7 +18,7 @@ import numpy as np
 from hardware.nidaq import DAQ
 
 from gui.core import GUICore
-from gui.fast_steering_mirror import FSMGuiComponents
+from gui.fast_steering_mirror import FSMCore, FSMGuiComponents
 from gui.single_photon_counter import SPCCore, SPCGuiComponents
 from gui.single_photon_counter import Plotting as SPCPlotting
 
@@ -27,6 +27,7 @@ class Confocal(GUICore):
     def __init__(self):
         super().__init__()
         spc = SPCCore()
+        fsm = FSMCore()
 
         # Load stylesheet
         with open(os.path.join(os.getcwd() + "\\css\\confocal.css"), 'r') as f:
@@ -41,8 +42,8 @@ class Confocal(GUICore):
 
         spc_plotting = SPCPlotting(style)
         plotting = Plotting(style)
-        self.spc_plot_widget = spc_plotting.spc_plot_widget
-        self.fsm_plot_widget = plotting.fsm_plot_widget
+        # self.spc_plot_widget = spc_plotting.spc_plot_widget
+        # self.fsm_plot_widget = plotting.fsm_plot_widget # TODO: Probably get this from each individual class
         self.tst_plot_widget = plotting.tst_plot_widget          # Test plot widget
 
         self.spc_plot_widget = spc.spc_plot_widget
@@ -51,6 +52,10 @@ class Confocal(GUICore):
         # # Attach timer for updating the SPC plot, connecting to update function
         self.spc_timer = spc.timer
         self.spc_timer.start()
+
+        self.fsm_plot_widget = fsm.plot_widget
+        self.fsm_timer = fsm.timer
+        self.fsm_timer.start(10)  # interval is in milliseconds
 
         qb = QHBoxLayout()
         qb.addWidget(spc.spc_components.label_ms)
@@ -63,9 +68,9 @@ class Confocal(GUICore):
         grid_layout.addLayout(qb, 0, 3)
         grid_layout.addWidget(self.tst_plot_widget, 1, 0, 2, 2)
         grid_layout.addWidget(self.spc_plot_widget, 1, 2, 2, 2)
-        grid_layout.addLayout(self.fsm_components.label_box, 3, 3)
-        grid_layout.addLayout(self.fsm_components.button_box, 4, 3, 1, 2)
-        grid_layout.addLayout(self.fsm_components.hbox, 5, 3, 1, 2)
+        grid_layout.addLayout(fsm.label_box, 3, 3)
+        # grid_layout.addLayout(fsm.button_box, 4, 3, 1, 2)
+        grid_layout.addLayout(fsm.hbox, 5, 3, 1, 2)
         grid_layout.addWidget(self.fsm_plot_widget, 6, 3, 2, 2)
         self.setLayout(grid_layout)  # Set the layout for the widget
 

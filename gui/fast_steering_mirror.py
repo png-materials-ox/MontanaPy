@@ -46,7 +46,6 @@ class FSM(GUICore):
         self.show()
 
 
-
 class FSMCore(GUICore):
     def __init__(self):
         super().__init__()

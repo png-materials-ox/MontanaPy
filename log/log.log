@@ -1506,3 +1506,18 @@
 2023-04-27 01:24:30,404 INFO:Confocal Window Opened
 2023-04-27 01:25:21,911 INFO:Sample time set to 100.0 ms
 2023-04-27 01:25:25,781 INFO:Sample time set to 1.0 ms
+2023-04-27 01:32:56,353 INFO:ScanThread called
+2023-04-27 01:32:56,355 INFO:PlotThread called
+2023-04-27 01:32:56,375 INFO:FSM Window Opened
+2023-04-27 01:33:02,755 INFO:FSM start button clicked
+2023-04-27 01:33:02,758 INFO:ScanThread run
+2023-04-27 01:33:02,758 INFO:PlotThread run
+2023-04-27 01:33:10,182 INFO:FSM stop button clicked
+2023-04-27 01:33:10,182 INFO:ScanThread stopped
+2023-04-27 01:33:10,191 INFO:PlotThread stopped
+2023-04-27 01:38:21,699 INFO:ScanThread called
+2023-04-27 01:38:21,701 INFO:PlotThread called
+2023-04-27 01:38:21,800 INFO:Confocal Window Opened
+2023-04-27 01:39:42,245 INFO:ScanThread called
+2023-04-27 01:39:42,246 INFO:PlotThread called
+2023-04-27 01:39:42,336 INFO:Confocal Window Opened
