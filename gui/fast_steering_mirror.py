@@ -27,6 +27,30 @@ class FSM(GUICore):
         self.setWindowTitle("Display Values and Plot")
         self.setGeometry(200, 200, 800, 600)
 
+        core = FSMCore()
+        self.fsm = core.fsm_components
+
+        ########################################
+        #### Create a grid layout container ####
+        ########################################
+        grid_layout = QGridLayout()
+        grid_layout.addLayout(core.label_box, 0, 0)
+        grid_layout.addLayout(core.button_box, 1, 0, 1, 2)
+        grid_layout.addLayout(core.hbox, 2, 0, 1, 2)
+        grid_layout.addWidget(core.plot_widget, 3, 0, 2, 2)
+        self.setLayout(grid_layout) # Set the layout for the widget
+
+        self.fsm_timer = core.timer
+        self.fsm_timer.start(10)  # interval is in milliseconds
+
+        self.show()
+
+
+
+class FSMCore(GUICore):
+    def __init__(self):
+        super().__init__()
+
         # TODO: Need to work out how to properly get these from the input forms
         self.dwell_ms = 10
         self.xsteps = 100
@@ -35,7 +59,7 @@ class FSM(GUICore):
 
         # Call a subclass which contains layout components for the FSM page
         self.fsm_components = FSMGuiComponents(self.xsteps, self.ysteps, self.roi, self.dwell_ms)
-        self.fsm = nfsm.FSM() # FSM hardware class
+        self.fsm = nfsm.FSM()  # FSM hardware class
 
         # Calculate scan range
         sr = self.fsm.calc_scan_voltage_range(roi=self.roi)
@@ -82,27 +106,14 @@ class FSM(GUICore):
         self.fsm_components.input_ysteps.returnPressed.connect(lambda: self._store_ysteps(self.fsm_components.input_ysteps.text()))
         self.fsm_components.input_roi.returnPressed.connect(lambda: self._store_roi(self.fsm_components.input_roi.text()))
 
-        ########################################
-        #### Create a grid layout container ####
-        ########################################
-        grid_layout = QGridLayout()
-        grid_layout.addLayout(self.label_box, 0, 0)
-        grid_layout.addLayout(self.button_box, 1, 0, 1, 2)
-        grid_layout.addLayout(self.hbox, 2, 0, 1, 2)
-        grid_layout.addWidget(self.plot_widget, 3, 0, 2, 2)
-        self.setLayout(grid_layout) # Set the layout for the widget
-
         # Create a timer to update the value every 10 ms
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_position)
-        self.timer.start(10)  # interval is in milliseconds
-        # super().qtimer(self.update_position, 10)
 
-        self.show()
 
     def _store_dwell_time(self, text):
         self.dwell_ms = int(text) / 1000
-        self.logging.info("Dwell time set to {:f} ms".format(self.dwell_time*1000))
+        self.logging.info("Dwell time set to {:f} ms".format(self.dwell_time * 1000))
 
     def _store_xsteps(self, text):
         self.xsteps = int(text)
@@ -133,15 +144,8 @@ class FSM(GUICore):
 
     @Slot(list, list)
     def update_plot(self, x, y):
-        self.plot_widget.plot(x, y, pen=pg.mkPen(width=7, color='#ffa02f'), symbol='o', symbolPen='#ffa02f', clear=True)
-
-class FSMCore(GUICore):
-    def __init__(self):
-        super().__init__()
-        super().__init__()
-        self.fsm_components = FSMGuiComponents()
-
-
+        self.plot_widget.plot(x, y, pen=pg.mkPen(width=7, color='#ffa02f'), symbol='o', symbolPen='#ffa02f',
+                              clear=True)
 
 class FSMGuiComponents(GUICore):
     def __init__(self, xsteps, ysteps, roi, dwell_ms):
